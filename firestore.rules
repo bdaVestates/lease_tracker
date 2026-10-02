@@ -1,0 +1,36 @@
+rules_version = '2';
+
+// Vestates lease dashboard: only people on the team list (the "members"
+// collection) can read the data. Editors and admins can change it.
+// Admins can also manage the team list.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null
+        && request.auth.token.email != null
+        && request.auth.token.email_verified == true;
+    }
+    function myEmail() { return request.auth.token.email.lower(); }
+    function memberDoc() { return /databases/$(database)/documents/members/$(myEmail()); }
+    function isMember() { return signedIn() && exists(memberDoc()); }
+    function myRole() { return get(memberDoc()).data.role; }
+    function canEdit() { return isMember() && myRole() in ['editor', 'admin']; }
+    function isAdmin() { return isMember() && myRole() == 'admin'; }
+
+    // Team list. Document ID = email address in lower case.
+    // Fields: role ("admin", "editor" or "viewer"), name (optional).
+    match /members/{memberEmail} {
+      allow get: if signedIn() && (memberEmail == myEmail() || isAdmin());
+      allow list, write: if isAdmin();
+    }
+
+    match /config/{docId}    { allow read: if isMember(); allow write: if canEdit(); }
+    match /units/{docId}     { allow read: if isMember(); allow write: if canEdit(); }
+    match /landlords/{docId} { allow read: if isMember(); allow write: if canEdit(); }
+    match /payments/{docId}  { allow read: if isMember(); allow write: if canEdit(); }
+
+    // Everything else is closed.
+    match /{document=**} { allow read, write: if false; }
+  }
+}

@@ -1,0 +1,1951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vestates lease dashboard</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600&family=Lora:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --font-head:"Lora",Georgia,serif;
+  --bg:#F6F1E6;--paper:#FFFFFF;--panel:#FFFFFF;--solid:#FFFFFF;--cream:#FBF7EF;
+  --ink:#1E2A5E;--ink2:#3A4572;--muted:#6E7088;
+  --line:#E5DCCA;--soft:#F1EADC;--field:#FFFFFF;--card:#FBF7EF;--chip:#FFFFFF;
+  --brass:#A8823A;--wm:0.05;
+  --exp:#C4402F;--d30:#D2772B;--d60:#BF9420;--d90:#8C8A33;--d180:#3D8A47;--ok:#2E7D3A;--info:#3D56B2;
+  color-scheme:light;
+}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+*,*::before,*::after{box-sizing:inherit}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 14px/1.5 "Schibsted Grotesk",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+#watermark{position:fixed;inset:0;z-index:-1;display:flex;align-items:center;justify-content:center;pointer-events:none;overflow:hidden}
+#watermark img{width:min(78vw,980px);height:auto;opacity:var(--wm)}
+.wrap{max-width:1280px;margin:0 auto;padding:0 28px 56px}
+
+/* ---------- masthead ---------- */
+header.top{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;padding:30px 0 22px}
+.brand{display:flex;gap:14px;align-items:center}
+.mark{width:46px;height:46px;border-radius:12px;background:var(--ink);color:#F6F1E6;display:grid;place-items:center;font:600 24px/1 var(--font-head);flex:none}
+h1{font-family:var(--font-head);font-size:30px;font-weight:600;margin:0;letter-spacing:-0.015em;line-height:1.1}
+.sub{color:var(--muted);margin:4px 0 0;font-size:13px}
+.balance{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:14px 20px;text-align:right;min-width:300px;max-width:440px;position:relative;overflow:hidden}
+.balance::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--brass)}
+.balance .lab{font-size:12px;color:var(--muted)}
+.balance .amt{font-family:var(--font-head);font-size:30px;font-weight:600;line-height:1.2;letter-spacing:-0.01em}
+.balance .sub2{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.45}
+
+/* ---------- tab bar ---------- */
+.tabs{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:6px;background:var(--paper);border:1px solid var(--line);border-radius:14px;margin-bottom:8px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+.tab{font:inherit;font-weight:500;background:transparent;border:0;border-radius:9px;padding:8px 20px;cursor:pointer;color:var(--muted)}
+.tab:hover{color:var(--ink);background:var(--cream)}
+.tab[aria-selected="true"]{background:var(--ink);color:#FFFDF8}
+.spacer{flex:1}
+.save-note{font-size:12px;color:var(--muted)}
+.sync{display:inline-flex;align-items:center;gap:6px}
+.sync::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.sync.ok::before{background:var(--ok)}.sync.busy::before{background:var(--d60)}.sync.err::before{background:var(--exp)}
+
+/* ---------- controls ---------- */
+.btn{font:inherit;font-weight:500;border:1px solid var(--line);background:var(--paper);border-radius:9px;padding:7px 14px;cursor:pointer;color:var(--ink)}
+.btn:hover{border-color:var(--ink2)}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:#FFFDF8}
+.btn.primary:hover{background:var(--ink2)}
+.btn.danger{color:var(--exp);border-color:color-mix(in srgb,var(--exp) 45%,transparent)}
+.btn.small{padding:4px 10px;font-size:12px;border-radius:7px;white-space:nowrap}
+.btn:disabled{opacity:0.4;cursor:not-allowed}
+.btn:disabled:hover{border-color:var(--line)}
+:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font:inherit;font-size:13px;background:var(--paper);color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:6px 14px;cursor:pointer}
+.chip:hover{border-color:var(--ink2)}
+.chip[aria-pressed="true"]{background:var(--ink);color:#FFFDF8;border-color:var(--ink)}
+select,input[type=search],input[type=text],input[type=number],input[type=date],input[type=email],input[type=color],textarea{font:inherit;background:var(--field);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:7px 10px;max-width:100%}
+select:hover,input:hover,textarea:hover{border-color:#D4C7AE}
+input[type=search]{min-width:220px}
+
+/* ---------- panels ---------- */
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px 24px;min-width:0}
+.panel h2{font-family:var(--font-head);font-size:19px;font-weight:600;margin:0 0 4px;letter-spacing:-0.01em}
+.cap{color:var(--muted);font-size:12.5px;margin:0 0 14px;max-width:96ch}
+.section-h{display:flex;align-items:baseline;gap:12px;margin:30px 0 12px}
+.section-h h2{font-family:var(--font-head);font-size:19px;font-weight:600;margin:0}
+.section-h .cap{margin:0}
+
+/* ---------- hero ---------- */
+.hero{padding:30px 2px 6px;border-top:1px solid var(--line);margin-top:22px}
+.verdict{font-family:var(--font-head);font-size:25px;line-height:1.42;font-weight:500;max-width:62ch;margin:0;color:var(--ink);letter-spacing:-0.005em}
+.verdict b{font-weight:600;color:var(--brass)}
+
+/* ---------- runway (expiry tiles) ---------- */
+.runway{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:18px;overflow:hidden;margin:0}
+.runway.r4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.tile{--c:var(--muted);position:relative;background:var(--paper);border:0;border-radius:0;padding:20px 20px 18px;cursor:pointer;text-align:left;font:inherit;color:var(--ink);transition:background .15s}
+.tile::before{content:"";position:absolute;left:0;right:0;top:0;height:5px;background:var(--c)}
+.tile:hover{background:var(--cream)}
+.tile[aria-pressed="true"]{background:color-mix(in srgb,var(--c) 9%,var(--paper))}
+.tile[aria-pressed="true"]::after{content:"Filtering";position:absolute;right:14px;top:16px;font-size:11px;color:var(--c);font-weight:600}
+.tile .lab{font-size:12.5px;color:var(--muted);margin-bottom:8px}
+.tile .n{font-family:var(--font-head);font-size:38px;font-weight:600;line-height:1;color:var(--c)}
+.tile .v{font-size:12.5px;color:var(--ink2);margin-top:8px}
+
+/* ---------- KPI strip ---------- */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:18px;overflow:hidden;margin:16px 0 30px}
+.kpi{background:var(--paper);padding:16px 20px}
+.kpi .lab{font-size:12px;color:var(--muted);margin-bottom:6px}
+.kpi .bval{font-family:var(--font-head);font-size:23px;font-weight:600;letter-spacing:-0.01em;line-height:1.2}
+
+/* ---------- tables ---------- */
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 14px;padding:12px;background:var(--cream);border:1px solid var(--soft);border-radius:12px}
+table.list,table.land{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
+table.list th,table.land th{font-weight:500;font-size:12px;color:var(--muted);text-align:left;padding:10px 10px;background:var(--cream);border-bottom:1px solid var(--line);white-space:nowrap;position:sticky;top:0}
+table.list th:first-child,table.land th:first-child{border-top-left-radius:10px}
+table.list th:last-child,table.land th:last-child{border-top-right-radius:10px}
+table.list td,table.land td{padding:10px 10px;border-bottom:1px solid var(--soft);vertical-align:middle}
+tr.pr td:first-child{box-shadow:inset 4px 0 0 var(--pc);padding-left:16px;font-weight:500}
+tr.pr:hover td{background:color-mix(in srgb,var(--pc) 6%,var(--paper))}
+tr.tot td{font-weight:600;border-top:1px solid var(--line);background:var(--cream);border-bottom:0}
+.num{text-align:right;white-space:nowrap}
+.badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:500;white-space:nowrap}
+.b-exp{background:color-mix(in srgb,var(--exp) 13%,var(--paper));color:var(--exp)}
+.b-30{background:color-mix(in srgb,var(--d30) 15%,var(--paper));color:#A85B1C}
+.b-60{background:color-mix(in srgb,var(--d60) 18%,var(--paper));color:#8A6A12}
+.b-90{background:color-mix(in srgb,var(--d90) 18%,var(--paper));color:#66641F}
+.b-180{background:color-mix(in srgb,var(--d180) 14%,var(--paper));color:var(--d180)}
+.b-later{background:var(--soft);color:var(--muted)}
+.b-vac{background:color-mix(in srgb,var(--brass) 16%,var(--paper));color:#7E6024}
+tr.vacated td{color:var(--muted)}
+tr.vacated td:first-child{box-shadow:inset 4px 0 0 color-mix(in srgb,var(--pc) 45%,var(--paper))}
+.b-multi{background:color-mix(in srgb,var(--info) 12%,var(--paper));color:var(--info)}
+.badge+.badge{margin-left:4px}
+.hl-sub{display:block;margin-top:4px}
+.hint{font-size:11px;color:var(--muted);margin-top:3px}
+.contact-btn{font:inherit;font-size:12px;background:transparent;border:1px solid var(--line);border-radius:6px;padding:3px 8px;cursor:pointer;color:var(--info)}
+select.sm{font-size:12px;padding:4px 8px}
+.note-in{font:inherit;font-size:12px;width:100%;min-width:130px;background:transparent;color:var(--ink);border:1px solid transparent;border-radius:6px;padding:4px 6px}
+.note-in:hover{border-color:var(--line);background:var(--paper)}
+.note-in:focus{border-color:var(--brass);background:var(--paper)}
+.pay-cell{display:flex;gap:6px;align-items:center;flex-wrap:wrap;min-width:170px}
+.left-amt{font-size:11.5px;color:var(--muted);white-space:nowrap}
+.paid-amt{font-size:12px;color:var(--ok);font-weight:500}
+.pdot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--pc);margin-right:6px}
+.tablewrap{overflow-x:auto;border:1px solid var(--soft);border-radius:12px}
+
+/* ---------- properties + concentration ---------- */
+.grid2{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:16px;margin-top:16px}
+.pcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
+.pcard{border:1px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;background:var(--paper);font:inherit;color:var(--ink);text-align:left;position:relative}
+.pcard::before{content:"";position:absolute;left:14px;top:15px;width:8px;height:8px;border-radius:50%;background:var(--pc)}
+.pcard .nm{font-weight:600;font-size:13px;margin-bottom:8px;padding-left:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pcard:hover{border-color:var(--pc)}
+.pcard[aria-pressed="true"]{border-color:var(--pc);box-shadow:inset 0 0 0 1px var(--pc);background:color-mix(in srgb,var(--pc) 6%,var(--paper))}
+.pbar{height:6px;border-radius:3px;background:var(--soft);overflow:hidden;margin-bottom:7px}
+.pbar i{display:block;height:100%;background:var(--pc)}
+.pcard .meta{font-size:12px;color:var(--muted);display:flex;justify-content:space-between}
+.conc{width:100%;border-collapse:collapse;font-size:13px}
+.conc td{padding:7px 6px;border-bottom:1px solid var(--soft)}
+.conc .bar{background:var(--soft);border-radius:4px;height:8px;overflow:hidden}
+.conc .bar i{display:block;height:100%;background:var(--brass)}
+.split{display:flex;height:12px;border-radius:6px;overflow:hidden;margin:8px 0 10px;gap:2px}
+.split span{display:block;height:100%}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+
+/* ---------- cash flow ---------- */
+.qgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:14px 0 4px}
+.qcard{border:1px solid var(--line);border-radius:14px;padding:16px 18px;background:var(--paper);cursor:pointer;transition:border-color .15s}
+.qcard:hover{border-color:var(--brass)}
+.qcard.pocket{border-color:var(--exp);background:color-mix(in srgb,var(--exp) 5%,var(--paper))}
+.qcard .qh{font-family:var(--font-head);font-weight:600;font-size:16px;margin-bottom:10px}
+.qcard .row{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;color:var(--muted);padding:3px 0}
+.qcard .row b{color:var(--ink);font-weight:500}
+.qcard .net{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);display:flex;justify-content:space-between;align-items:baseline}
+.qcard .net .v{font-family:var(--font-head);font-size:24px;font-weight:600}
+.qcard .flag{font-size:11.5px;color:var(--exp);margin-top:6px}
+td.num.click{cursor:pointer}
+td.num.click:hover{background:color-mix(in srgb,var(--brass) 12%,var(--paper))!important}
+.tag-var{font-size:11px;color:#8A6A12;border:1px solid var(--d60);border-radius:999px;padding:0 7px;white-space:nowrap}
+.tag-fx{font-size:11px;color:var(--info);border:1px solid color-mix(in srgb,var(--info) 50%,transparent);border-radius:999px;padding:0 7px;white-space:nowrap;margin-left:4px}
+.fx-native{font-size:11px;color:var(--muted);display:block}
+.note-cell{max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:12px}
+
+/* ---------- alert ---------- */
+.alert{display:flex;gap:14px;align-items:center;flex-wrap:wrap;border:1px solid color-mix(in srgb,var(--exp) 35%,var(--line));background:color-mix(in srgb,var(--exp) 6%,var(--paper));border-radius:14px;padding:14px 18px;margin:18px 0 0;font-size:13.5px;position:relative;overflow:hidden}
+.alert::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--exp)}
+.alert p{margin:0;flex:1;min-width:240px;padding-left:4px}
+
+/* ---------- data panel, dialog ---------- */
+details.data summary{cursor:pointer;font-family:var(--font-head);font-weight:600;font-size:17px}
+.data-body{margin-top:12px;display:grid;gap:14px}
+.drop{display:flex;align-items:center;justify-content:center;text-align:center;border:1.5px dashed #D4C7AE;border-radius:12px;padding:20px 14px;cursor:pointer;color:var(--muted);background:var(--cream)}
+.drop:hover,.drop.over{border-color:var(--brass);color:var(--ink)}
+.drop:focus-within{outline:2px solid var(--brass);outline-offset:2px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+ul.status{list-style:none;margin:0;padding:0;display:grid;gap:4px;font-size:13px}
+ul.status li{padding-left:18px;position:relative}
+ul.status li::before{content:"";position:absolute;left:0;top:7px;width:8px;height:8px;border-radius:50%;background:var(--muted)}
+ul.status li.ok::before{background:var(--ok)}
+ul.status li.warn::before{background:var(--d60)}
+ul.status li.err::before{background:var(--exp)}
+dialog{border:1px solid var(--line);border-radius:18px;padding:0;width:min(640px,94vw);background:var(--paper);color:var(--ink);box-shadow:0 24px 70px rgba(50,40,20,0.22)}
+dialog::backdrop{background:rgba(40,36,28,0.35)}
+#dlg-form{padding:22px 24px;max-height:88vh;overflow:auto}
+#dlg-form h3{font-family:var(--font-head);font-size:20px;margin:0 0 14px}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px 14px}
+.f label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+.f input,.f select,.f textarea{width:100%}
+.f-full{grid-column:1/-1}
+.f.chk label{display:flex;gap:6px;align-items:center;color:var(--ink);font-size:13px;margin:24px 0 0}
+.f.chk input{width:auto}
+.err{color:var(--exp);font-size:13px;min-height:18px;margin:10px 0 0}
+.dlg-actions{display:flex;gap:8px;align-items:center;margin-top:8px}
+.payhist{grid-column:1/-1}
+.payhist table{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0 4px}
+.payhist th{font-weight:500;color:var(--muted);text-align:left;padding:6px;border-bottom:1px solid var(--line);background:var(--cream)}
+.payhist td{padding:6px;border-bottom:1px solid var(--soft)}
+.paysum{display:flex;gap:10px;flex-wrap:wrap;font-size:13px;margin:0 0 8px}
+.paysum span{background:var(--cream);border:1px solid var(--soft);border-radius:10px;padding:6px 10px}
+.paysum b{font-weight:600;display:block;font-family:var(--font-head);font-size:15px}
+footer{color:var(--muted);font-size:12px;margin-top:24px;padding-top:16px;border-top:1px solid var(--line)}
+.ro .w-only{display:none!important}
+.ro select[data-act],.ro input[data-act]{pointer-events:none;opacity:0.65}
+.loading{color:var(--muted);padding:30px 0;text-align:center}
+
+table.list th.num,table.land th.num{text-align:right}
+table.list td:nth-child(5){white-space:nowrap}
+.tablewrap.tall{max-height:74vh;overflow:auto}
+.tablewrap.tall th{z-index:2}
+.pay-cell{min-width:210px}
+/* renewal highlights */
+tr.pr.st-talks td{background:color-mix(in srgb,var(--ok) 10%,var(--paper))}
+tr.pr.st-talks:hover td{background:color-mix(in srgb,var(--ok) 15%,var(--paper))}
+tr.pr.st-leaving td{background:color-mix(in srgb,var(--exp) 9%,var(--paper))}
+tr.pr.st-leaving:hover td{background:color-mix(in srgb,var(--exp) 14%,var(--paper))}
+tr.pr.vacated td{background:var(--cream)}
+select.sm.r-talks{border-color:var(--ok);color:var(--ok);font-weight:500;background:color-mix(in srgb,var(--ok) 8%,var(--paper))}
+select.sm.r-leaving{border-color:var(--exp);color:var(--exp);font-weight:500;background:color-mix(in srgb,var(--exp) 7%,var(--paper))}
+.rlegend{display:flex;gap:16px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--muted);margin:0 0 10px}
+.rlegend span{display:inline-flex;align-items:center;gap:6px}
+.rlegend i{width:14px;height:14px;border-radius:4px;display:inline-block;border:1px solid var(--line)}
+.rlegend button{font:inherit;font-size:12px;background:none;border:0;padding:0;color:var(--muted);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.rlegend button:hover{color:var(--ink)}
+.rlegend button[aria-pressed="true"]{color:var(--ink);font-weight:600}
+/* sign-in + team */
+#gate{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px}
+#gate .card{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:30px 30px 26px;width:min(420px,100%)}
+#gate h2{font-family:var(--font-head);font-size:22px;margin:14px 0 4px}
+#gate .cap{margin-bottom:18px}
+#gate .row{display:grid;gap:10px}
+#gate input{width:100%}
+#gate .or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12px;margin:16px 0}
+#gate .or::before,#gate .or::after{content:"";flex:1;height:1px;background:var(--line)}
+#gate .gbtn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:10px}
+#gate .link{background:none;border:0;padding:0;font:inherit;font-size:12.5px;color:var(--info);cursor:pointer}
+#gate .msg{font-size:13px;min-height:18px;margin:10px 0 0}
+#gate .msg.err{color:var(--exp)}#gate .msg.ok{color:var(--ok)}
+#gate pre{background:var(--cream);border:1px solid var(--soft);border-radius:8px;padding:10px;font-size:12px;overflow:auto}
+.who{font-size:12px;color:var(--muted);display:inline-flex;gap:8px;align-items:center}
+.team{width:100%;border-collapse:collapse;font-size:13px;margin:6px 0}
+.team td,.team th{padding:7px 6px;border-bottom:1px solid var(--soft);text-align:left}
+.team th{font-weight:500;color:var(--muted);font-size:12px}
+.team-add{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
+@media (max-width:980px){
+  .runway{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .runway.r4,.qgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .grid2{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:640px){
+  .wrap{padding:0 14px 40px}
+  .runway{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .runway .tile:last-child:nth-child(odd){grid-column:span 2}
+  .tabs{position:static}
+  .section-h{flex-wrap:wrap;gap:4px 12px}
+  h1{font-size:24px}
+  .verdict{font-size:20px}
+  .tile .n{font-size:30px}
+  .fields{grid-template-columns:1fr}
+  .balance{text-align:left;width:100%;min-width:0;max-width:none}
+  .panel{padding:16px}
+  .qgrid{grid-template-columns:minmax(0,1fr)}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div id="watermark" aria-hidden="true"><img src="data:image/png;base64,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" alt=""></div>
+<div id="gate">
+  <div class="card">
+    <div class="mark" aria-hidden="true">V</div>
+    <div id="gate-body"><h2>Vestates lease dashboard</h2><p class="cap">Loading…</p></div>
+  </div>
+</div>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="mark" aria-hidden="true">V</div>
+      <div><h1>Vestates lease dashboard</h1><p class="sub" id="sub"></p></div>
+    </div>
+    <div class="head-right">
+      <div class="balance" id="box-tenant">
+        <div class="lab">Rent received (all recorded payments)</div>
+        <div class="amt" id="bal-amt"></div>
+        <div class="sub2" id="bal-sub"></div>
+      </div>
+      <div class="balance" id="box-land" hidden>
+        <div class="lab" id="tl-lab">Landlord rent per year</div>
+        <div class="amt" id="tl-amt"></div>
+        <div class="sub2" id="tl-sub"></div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Dashboard pages">
+    <button type="button" class="tab" role="tab" id="tabbtn-tenants" data-tab="tenants" aria-selected="true" aria-controls="tab-tenants">Tenants</button>
+    <button type="button" class="tab" role="tab" id="tabbtn-landlords" data-tab="landlords" aria-selected="false" aria-controls="tab-landlords">Landlords</button>
+    <span class="spacer"></span>
+    <span class="who" id="who"></span>
+    <span class="save-note sync" id="save-note">Connecting…</span>
+    <button type="button" class="btn primary" id="btn-download" title="Full report: summary, tenant and landlord registers, payments and cash flow">Download full report</button>
+  </nav>
+
+  <!-- ================= TENANTS ================= -->
+  <div id="tab-tenants" role="tabpanel" aria-labelledby="tabbtn-tenants">
+    <div id="hl-alert"></div>
+    <section class="hero"><p class="verdict" id="verdict" aria-live="polite"></p></section>
+    <div class="section-h"><h2>Lease expiry</h2><p class="cap">Click a group to filter the leases below.</p></div>
+    <section aria-label="Lease expiry"><div class="runway" id="tiles"></div></section>
+    <section class="kpis" id="kpis" aria-label="Key figures"></section>
+
+    <section class="panel">
+      <h2>Leases</h2>
+      <p class="cap">Changes are shared with everyone who uses this dashboard. Use Edit to change a unit, or Add unit for a new one. Marking a lease Renewed removes it from the expiry tiles. Use Payments to record what a tenant has paid; when a lease gets new dates, payment status starts again for the new term.</p>
+      <div class="toolbar">
+        <select id="f-prop" aria-label="Filter by property"></select>
+        <select id="f-status" aria-label="Filter by occupancy"><option value="">All units</option><option value="occupied">Occupied</option><option value="vacant">Vacant</option><option value="vacated">Vacated (moved out)</option><option value="not_managed">Not managed</option></select>
+        <select id="f-qtr" aria-label="Filter by the quarter the lease ends in"><option value="">All quarters</option></select>
+        <select id="f-rstat" aria-label="Filter by renewal status">
+          <option value="">All renewal statuses</option><option value="__none">Not started</option><option>In talks</option><option>Renewed</option><option>Leaving</option><option>Notice given</option><option value="__leaving">Moving out (leaving or notice given)</option>
+        </select>
+        <select id="f-pay" aria-label="Filter by payment">
+          <option value="">All payments</option><option value="unpaid">Unpaid</option><option value="Partial">Partial</option><option value="Paid">Paid</option>
+        </select>
+        <select id="f-term" aria-label="Filter by lease length"><option value="">All lease lengths</option><option value="multi">2 years and above</option><option value="short">Under 2 years</option><option value="nodates">No start or end date</option></select>
+        <select id="f-sort" aria-label="Sort leases"><option value="urgency">Soonest expiry first</option><option value="property">Group by property</option></select>
+        <input type="search" id="f-search" placeholder="Search unit or property" aria-label="Search leases">
+        <span class="cap" id="count-cap" style="margin:0"></span>
+        <span class="spacer"></span>
+        <button type="button" class="chip" id="btn-contacts" aria-pressed="false">Show tenant names &amp; contacts</button>
+        <button type="button" class="chip" id="btn-copy">Copy follow-up list</button>
+        <button type="button" class="chip" id="btn-dl-list" title="Downloads the leases currently shown, with the filters and sort you have applied">Download this list</button>
+        <button type="button" class="btn w-only" id="btn-fx">Exchange rates</button>
+        <button type="button" class="btn primary w-only" id="btn-add-unit">Add unit</button>
+      </div>
+      <div class="rlegend" id="rlegend">
+        <button type="button" data-rs="In talks"><i style="background:color-mix(in srgb,var(--ok) 18%,var(--paper));border-color:var(--ok)"></i>In talks <b id="lg-talks"></b></button>
+        <button type="button" data-rs="__leaving"><i style="background:color-mix(in srgb,var(--exp) 16%,var(--paper));border-color:var(--exp)"></i>Moving out (leaving or notice given) <b id="lg-leave"></b></button>
+        <span><i style="background:var(--cream)"></i>Moved out</span>
+      </div>
+      <div class="tablewrap tall"><table class="list" id="list"></table></div>
+    </section>
+
+    <div class="grid2">
+      <section class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap">
+          <div><h2>Properties</h2><p class="cap">Each property has its own colour, used on its rows above. Click a card to filter the list.</p></div>
+          <button type="button" class="btn small w-only" id="btn-manage-props">Rename, recolour or remove</button>
+        </div>
+        <div class="pcards" id="pcards"></div>
+      </section>
+      <section class="panel">
+        <h2>Tenant concentration</h2>
+        <p class="cap" id="cap-conc"></p>
+        <table class="conc" id="conc"></table>
+        <div style="margin-top:14px">
+          <p class="cap" style="margin-bottom:6px">Occupied units by tenant type</p>
+          <div class="split" id="split"></div>
+          <div class="legend" id="split-key"></div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- ================= LANDLORDS ================= -->
+  <div id="tab-landlords" role="tabpanel" aria-labelledby="tabbtn-landlords" hidden>
+    <div class="section-h"><h2>Head leases</h2><p class="cap">Our own leases from landlords. Click a group to filter the register.</p></div>
+    <section aria-label="Head lease expiry"><div class="runway r4" id="ltiles"></div></section>
+    <section class="panel" style="margin-top:22px">
+      <div>
+          <h2>Cash flow by quarter, in a typical year</h2>
+          <p class="cap">Each lease's yearly rent and service charge is counted in the quarter its renewal rent falls due, which is the day after the lease ends (a lease ending 31 March is due in Q2). Landlord rent is what we pay landlords in that quarter each year, converted to naira. Red means we would be paying from pocket.</p>
+      </div>
+      <div class="qgrid" id="qgrid"></div>
+      <p class="cap" id="cap-noend" style="margin:8px 0 0"></p>
+    </section>
+
+    <section class="panel" style="margin-top:16px">
+      <h2>Expected income by property and quarter</h2>
+      <p class="cap">Each lease is counted in the quarter its renewal rent falls due. This adds up to the expected income in the cash flow cards above.</p>
+      <div class="tablewrap"><table class="land" id="inc-table"></table></div>
+    </section>
+
+    <section class="panel" style="margin-top:16px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap">
+        <div>
+          <h2>Landlord register</h2>
+          <p class="cap">Our own leases from landlords: what we pay, in what currency, and when the lease ends. Click a tile above to filter. Tick "Unspecified" when a payment is due but no figure has been agreed.</p>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="chip" id="btn-dl-land" title="Downloads the head leases currently shown">Download this list</button>
+        <button type="button" class="btn primary w-only" id="btn-add-land">Add landlord entry</button></div>
+      </div>
+      <div class="tablewrap"><table class="land" id="land"></table></div>
+    </section>
+  </div>
+
+  <!-- ================= DATA ================= -->
+  <details class="panel data" id="data-panel" style="margin-top:28px">
+    <summary>Data, backup and restore</summary>
+    <div class="data-body">
+      <p class="cap" style="margin:0">All changes save automatically to a shared database, so everyone with access sees the same figures on any device. Download the spreadsheet for a dated copy or to load into Power BI.</p>
+      <div class="w-only">
+        <p class="cap" style="margin-bottom:6px"><b>Replace the data from a spreadsheet.</b> Choose a spreadsheet downloaded from this dashboard (or a tenant register in the original layout). It replaces the tenant list for everyone, and the landlord list too if the file has one. Units with the same property and unit name keep their payment records.</p>
+        <label class="drop" id="drop"><input class="sr-only" type="file" id="file" accept=".xlsx,.xls"><span>Choose a spreadsheet, or drop it here</span></label>
+      </div>
+      <div class="chips">
+        <button type="button" class="chip" id="btn-backup">Download full backup (.json)</button>
+        <label class="chip w-only" style="cursor:pointer">Restore from a backup (.json)<input class="sr-only" type="file" id="file-json" accept=".json,application/json"></label>
+      </div>
+      <p class="cap" style="margin:0">The backup file holds everything, including payments and lease history. Keep it somewhere private: it contains tenant contacts.</p>
+      <ul class="status" id="status" aria-live="polite"></ul>
+      <div id="team-box" hidden>
+        <p class="cap" style="margin:8px 0 0"><b>Team access.</b> Only people listed here can open the dashboard. Editors can change data, viewers can only look, admins can also manage this list.</p>
+        <table class="team" id="team"></table>
+        <div class="team-add">
+          <input type="email" id="tm-email" placeholder="colleague@example.com" aria-label="Email address" style="min-width:240px">
+          <input type="text" id="tm-name" placeholder="Name (optional)" aria-label="Name">
+          <select id="tm-role" aria-label="Role"><option value="editor">Editor</option><option value="viewer">Viewer</option><option value="admin">Admin</option></select>
+          <button type="button" class="btn small primary" id="tm-add">Add person</button>
+          <span class="cap" id="tm-msg" style="margin:0"></span>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <footer id="foot"></footer>
+</div>
+
+<dialog id="dlg">
+  <form id="dlg-form" novalidate>
+    <h3 id="dlg-title"></h3>
+    <div class="fields" id="dlg-body"></div>
+    <p class="err" id="dlg-err" role="alert"></p>
+    <div class="dlg-actions">
+      <button type="button" class="btn danger" id="dlg-del" hidden>Delete</button>
+      <span class="spacer"></span>
+      <button type="button" class="btn" id="dlg-cancel">Cancel</button>
+      <button type="submit" class="btn primary" id="dlg-save">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+/* ===== STEP: paste your Firebase project settings here (Project settings > General > Your apps > Web app > SDK setup and configuration > Config) ===== */
+var FIREBASE_CONFIG = {
+  apiKey: "PASTE_API_KEY",
+  authDomain: "PASTE_PROJECT_ID.firebaseapp.com",
+  projectId: "PASTE_PROJECT_ID",
+  storageBucket: "PASTE_PROJECT_ID.appspot.com",
+  messagingSenderId: "PASTE_SENDER_ID",
+  appId: "PASTE_APP_ID"
+};
+/* ===== end of settings ===== */
+</script>
+<script>
+(function(){
+'use strict';
+/* data lives in the shared database (db capability) */
+var $=function(id){return document.getElementById(id);};
+var DATA=null;
+var MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+var PALETTE=['#e6194b','#3cb44b','#4363d8','#f58231','#911eb4','#22b8cf','#e64fb8','#a3c72b','#2a9d8f','#a0682f','#d4a017','#6c7a89','#9d6bff','#ff7a8a','#1f7a4d','#0b6fb8'];
+var state={tab:'tenants',tile:'',ltile:'',status:'',qtr:'',prop:'',rstat:'',pay:'',term:'',q:'',sort:'urgency',showContact:false};
+var DB=null,USER=null,DL=null,ME=null,CAN_WRITE=true,OFFLINE=false,pending=0,lastErr='',lostConn=false;
+var LOADED={config:false,units:false,landlords:false,payments:false};
+var synced={},queues={},renderPending=false;
+
+/* ---------- helpers ---------- */
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function clone(o){return JSON.parse(JSON.stringify(o));}
+function newId(p){return p+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+function fmt(n){
+  n=+n||0;var a=Math.abs(n),s=n<0?'\u2212':'';
+  if(a>=1e9)return s+'\u20A6'+(a/1e9).toFixed(2)+'bn';
+  if(a>=1e6)return s+'\u20A6'+(a/1e6).toFixed(1)+'m';
+  if(a>=1e3)return s+'\u20A6'+Math.round(a/1e3)+'k';
+  return s+'\u20A6'+Math.round(a);
+}
+function full(n){n=Math.round(+n||0);return (n<0?'\u2212':'')+'\u20A6'+Math.abs(n).toLocaleString('en-US');}
+function todayDate(){var d=new Date();return new Date(d.getFullYear(),d.getMonth(),d.getDate());}
+function daysTo(iso){if(!iso)return null;var d=new Date(iso+'T00:00:00');if(isNaN(d))return null;return Math.round((d-todayDate())/86400000);}
+function dfmt(iso){if(!iso)return '\u2013';var d=new Date(iso+'T00:00:00');if(isNaN(d))return esc(iso);return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}
+function dtxt(iso){if(!iso)return null;var p=iso.split('-');if(p.length!==3)return iso;return (+p[2])+' '+MONTHS[+p[1]-1]+' '+p[0];}
+function maskName(name){
+  if(!name)return name;var w=String(name).trim().split(/\s+/);
+  if(w.length===1)return w[0].charAt(0).toUpperCase()+'.';
+  return w[0].charAt(0).toUpperCase()+'. '+w[w.length-1].charAt(0).toUpperCase()+'.';
+}
+function dispName(n,type){if(type&&type!=='Individual')return n;return state.showContact?n:maskName(n);}
+function toNum(v){if(v===''||v==null)return null;var n=parseFloat(String(v).replace(/,/g,''));return isFinite(n)?n:null;}
+function copyText(t,cb){
+  function fallback(){var x=document.createElement('textarea');x.value=t;document.body.appendChild(x);x.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(x);if(cb)cb();}
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){if(cb)cb();},fallback);}else fallback();
+}
+
+/* ---------- data ---------- */
+function nextColor(d){
+  var used=Object.keys(d.propColors).map(function(k){return d.propColors[k];});
+  for(var i=0;i<PALETTE.length;i++)if(used.indexOf(PALETTE[i])<0)return PALETTE[i];
+  return PALETTE[Object.keys(d.propColors).length%PALETTE.length];
+}
+function normalize(d){
+  d.propColors=d.propColors||{};
+  d.fx=Object.assign({USD:1330,EUR:1570},d.fx||{});
+  d.units.forEach(function(u){
+    if(!u.id)u.id=newId('u');
+    u.currency=u.currency||'NGN';u.fxRent=(u.fxRent==null?null:+u.fxRent);u.fxSc=(u.fxSc==null?null:+u.fxSc);
+    if(u.currency!=='NGN'&&u.fxRent!=null){
+      u.rent=Math.round(u.fxRent*(d.fx[u.currency]||1));
+      u.sc=Math.round((u.fxSc||0)*(d.fx[u.currency]||1));
+    }else{u.rent=+u.rent||0;u.sc=+u.sc||0;}
+    u.billing=u.billing==='monthly'?'monthly':'upfront';u.monthly=u.billing==='monthly'?(+u.monthly||null):null;u.renewal=u.status==='occupied'?(u.renewal||''):'';u.vacatedOn=u.status==='vacated'?(u.vacatedOn||null):null;u.note=u.note||'';u.type=u.type||'Individual';u.group=u.group||'';delete u.pay;delete u.recv;
+    if(d.properties.indexOf(u.property)<0)d.properties.push(u.property);
+  });
+  d.properties.forEach(function(p){if(!d.propColors[p])d.propColors[p]=nextColor(d);});
+  d.landlord.forEach(function(l){
+    if(!l.id)l.id=newId('l');
+    l.dues=(l.dues||[]).slice(0,4);while(l.dues.length<4)l.dues.push(null);
+    l.dueVar=(l.dueVar||[]).slice(0,4);while(l.dueVar.length<4)l.dueVar.push(false);
+    l.link=l.link||'';l.note=l.note||'';l.landlord=l.landlord||'';l.currency=l.currency||'NGN';
+    ['start','end'].forEach(function(k){if(l[k]&&!/^\d{4}-\d{2}-\d{2}$/.test(l[k]))l[k]=pdate(l[k])||'';l[k]=l[k]||'';});
+  });
+  d.payments=d.payments||[];
+  return d;
+}
+function emptyData(){return {properties:[],propColors:{},units:[],landlord:[],payments:[],fx:{USD:1330,EUR:1570}};}
+function stable(o){
+  if(Array.isArray(o))return '['+o.map(stable).join(',')+']';
+  if(o&&typeof o==='object')return '{'+Object.keys(o).sort().filter(function(k){return o[k]!==undefined;}).map(function(k){return JSON.stringify(k)+':'+stable(o[k]);}).join(',')+'}';
+  return JSON.stringify(o===undefined?null:o);
+}
+function cfgDoc(){return {properties:DATA.properties,propColors:DATA.propColors,fx:DATA.fx};}
+function desired(){
+  var m={'config/main':cfgDoc()};
+  DATA.units.forEach(function(u){m['units/'+u.id]=u;});
+  DATA.landlord.forEach(function(l){m['landlords/'+l.id]=l;});
+  DATA.payments.forEach(function(p){m['payments/'+p.id]=p;});
+  return m;
+}
+function setNote(){
+  var el=$('save-note'),cls='sync',t;
+  if(OFFLINE){t='Not connected to the shared data';cls+=' err';}
+  else if(lostConn){t='Connection lost. Reload the page';cls+=' err';}
+  else if(!allLoaded()){t='Loading shared data\u2026';cls+=' busy';}
+  else if(!CAN_WRITE){t='View only';}
+  else if(pending){t='Saving\u2026';cls+=' busy';}
+  else if(lastErr){t=lastErr;cls+=' err';}
+  else{t='All changes saved for everyone';cls+=' ok';}
+  el.className='save-note '+cls;el.textContent=t;
+}
+function writeDoc(k,op){
+  var tries=0;
+  function attempt(){
+    var ref=DB.doc(k);
+    return (op[0]==='set'?ref.set(JSON.parse(JSON.stringify(op[1]))):ref.delete()).catch(function(e){
+      var c=e&&e.code;
+      if((c==='unavailable'||c==='resource-exhausted'||c==='aborted')&&tries++<2)return new Promise(function(r){setTimeout(r,600+Math.random()*900);}).then(attempt);
+      delete synced[k];
+      if(c==='permission-denied'){CAN_WRITE=false;document.body.classList.add('ro');lastErr='You have view-only access, so changes were not saved';}
+      else if(c==='resource-exhausted')lastErr='Today\u2019s free database allowance is used up. Changes will save again tomorrow';
+      else if(c==='unauthenticated'){lostConn=true;}
+      else lastErr='A change could not be saved. Check your connection and try again';
+    });
+  }
+  pending++;setNote();
+  var prev=queues[k]||Promise.resolve();
+  var p=prev.then(attempt).then(function(){pending--;setNote();});
+  queues[k]=p;
+}
+function sync(){
+  if(!DB||!CAN_WRITE||!allLoaded()){setNote();return;}
+  lastErr='';
+  var want=desired();
+  Object.keys(want).forEach(function(k){var j=stable(want[k]);if(synced[k]!==j){synced[k]=j;writeDoc(k,['set',want[k]]);}});
+  Object.keys(synced).forEach(function(k){if(!want[k]){delete synced[k];writeDoc(k,['del']);}});
+  setNote();
+}
+function save(){sync();}
+function allLoaded(){return LOADED.config&&LOADED.units&&LOADED.landlords&&LOADED.payments;}
+function scheduleRender(){
+  if(!allLoaded())return;
+  var a=document.activeElement;
+  if(a&&$('list').contains(a)&&/INPUT|SELECT|TEXTAREA/.test(a.tagName)){renderPending=true;return;}
+  renderAll();
+}
+function onLoaded(){normalize(DATA);setNote();scheduleRender();}
+function subErr(e){lostConn=true;if(e&&e.code==='resource-exhausted')lastErr='Today\u2019s free database allowance is used up';setNote();}
+var FS=null,AUTH=null,ROLE=null,MYNAME='',unsubs=[];
+function gate(html){$('gate').hidden=false;$('gate-body').innerHTML=html;}
+function gateOff(){$('gate').hidden=true;}
+function configured(){return FIREBASE_CONFIG&&FIREBASE_CONFIG.apiKey&&FIREBASE_CONFIG.apiKey.indexOf('PASTE')!==0;}
+function authMsg(e){
+  var c=e&&e.code||'';
+  if(/invalid-credential|wrong-password|user-not-found|invalid-email|invalid-login/.test(c))return 'That email and password do not match an account. Check them, or ask an admin to create your account.';
+  if(/too-many-requests/.test(c))return 'Too many attempts. Wait a few minutes and try again.';
+  if(/popup-closed|cancelled-popup/.test(c))return '';
+  if(/popup-blocked/.test(c))return 'Your browser blocked the sign-in window. Allow pop-ups for this site and try again.';
+  if(/unauthorized-domain/.test(c))return 'This web address is not allowed to sign in yet. In Firebase, add it under Authentication > Settings > Authorized domains.';
+  if(/operation-not-allowed/.test(c))return 'This sign-in method is switched off in Firebase (Authentication > Sign-in method).';
+  if(/network/.test(c))return 'No internet connection. Check your connection and try again.';
+  return 'Sign-in failed ('+esc(c||'unknown error')+').';
+}
+function showLogin(msg){
+  gate('<h2>Sign in</h2><p class="cap">Vestates lease dashboard. Use the Google account or email address your admin added.</p>'+
+    '<button type="button" class="btn gbtn" id="g-google"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.6l6.7-6.7C35.6 2.4 30.2 0 24 0 14.6 0 6.6 5.4 2.7 13.3l7.8 6C12.4 13.7 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.5 28.7c-.5-1.4-.8-3-.8-4.7s.3-3.2.8-4.7l-7.8-6C1 16.6 0 20.2 0 24s1 7.4 2.7 10.7l7.8-6z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.8 2.3-8.4 2.3-6.3 0-11.6-4.2-13.5-9.9l-7.8 6C6.6 42.6 14.6 48 24 48z"/></svg>Sign in with Google</button>'+
+    '<div class="or">or with email</div>'+
+    '<form id="g-form" class="row" novalidate><input type="email" id="g-email" placeholder="Email address" autocomplete="username" aria-label="Email address"><input type="password" id="g-pass" placeholder="Password" autocomplete="current-password" aria-label="Password"><button class="btn primary" type="submit">Sign in</button></form>'+
+    '<p style="margin:10px 0 0"><button type="button" class="link" id="g-reset">Forgot your password?</button></p>'+
+    '<p class="msg err" id="g-msg">'+(msg||'')+'</p>');
+  $('g-google').onclick=function(){var p=new firebase.auth.GoogleAuthProvider();p.setCustomParameters({prompt:'select_account'});AUTH.signInWithPopup(p).catch(function(e){$('g-msg').innerHTML=authMsg(e);});};
+  $('g-form').onsubmit=function(e){e.preventDefault();var em=$('g-email').value.trim(),pw=$('g-pass').value;if(!em||!pw){$('g-msg').textContent='Enter your email and password.';return;}$('g-msg').textContent='Signing in\u2026';$('g-msg').className='msg';AUTH.signInWithEmailAndPassword(em,pw).catch(function(er){$('g-msg').className='msg err';$('g-msg').innerHTML=authMsg(er);});};
+  $('g-reset').onclick=function(){var em=$('g-email').value.trim();if(!em){$('g-msg').className='msg err';$('g-msg').textContent='Type your email address above first.';return;}AUTH.sendPasswordResetEmail(em).then(function(){$('g-msg').className='msg ok';$('g-msg').textContent='If that address has an account, a reset link is on its way.';}).catch(function(er){$('g-msg').className='msg err';$('g-msg').innerHTML=authMsg(er);});};
+}
+function connect(){
+  if(!window.firebase){gate('<h2>Could not load</h2><p class="cap">The sign-in library did not load. Check your internet connection and reload the page.</p>');return;}
+  if(!configured()){gate('<h2>One step left</h2><p class="cap">This copy of the dashboard is not connected to a Firebase project yet. Open <b>index.html</b>, search it for <code>FIREBASE_CONFIG</code>, and paste in the settings from your Firebase project (see the README).</p>');return;}
+  firebase.initializeApp(FIREBASE_CONFIG);
+  AUTH=firebase.auth();FS=firebase.firestore();
+  AUTH.onAuthStateChanged(function(user){
+    unsubs.forEach(function(f){try{f();}catch(e){}});unsubs=[];
+    if(!user){showLogin();return;}
+    ME=(user.email||'').toLowerCase();MYNAME=user.displayName||ME;
+    if(!user.emailVerified){
+      var sent=false;
+      var ask=function(note){gate('<h2>Confirm your email</h2><p class="cap">For security, confirm that <b>'+esc(ME)+'</b> is yours. We have sent a link to that inbox. Open it, then come back and press the button below.</p><button type="button" class="btn primary" id="g-ver">I have confirmed it</button> <button type="button" class="btn" id="g-resend">Send the link again</button> <button type="button" class="btn" id="g-out">Sign out</button><p class="msg" id="g-msg">'+(note||'')+'</p>');
+        $('g-ver').onclick=function(){user.reload().then(function(){return user.getIdToken(true);}).then(function(){if(AUTH.currentUser&&AUTH.currentUser.emailVerified){location.reload();}else{$('g-msg').className='msg err';$('g-msg').textContent='Not confirmed yet. Open the link in the email first (check spam too).';}});};
+        $('g-resend').onclick=function(){user.sendEmailVerification().then(function(){$('g-msg').className='msg ok';$('g-msg').textContent='Sent. Check your inbox and spam folder.';}).catch(function(e){$('g-msg').className='msg err';$('g-msg').innerHTML=authMsg(e);});};
+        $('g-out').onclick=function(){AUTH.signOut();};};
+      user.sendEmailVerification().catch(function(){});ask();
+      return;
+    }
+    gate('<h2>Signing in\u2026</h2><p class="cap">'+esc(ME)+'</p>');
+    FS.collection('members').doc(ME).get().then(function(d){
+      if(!d.exists)throw {code:'permission-denied'};
+      ROLE=d.data().role||'viewer';
+      if(d.data().name)MYNAME=d.data().name;
+      CAN_WRITE=ROLE==='editor'||ROLE==='admin';
+      document.body.classList.toggle('ro',!CAN_WRITE);
+      $('who').innerHTML=esc(MYNAME)+' \u00b7 '+esc(ROLE.charAt(0).toUpperCase()+ROLE.slice(1))+' <button type="button" class="btn small" id="btn-signout">Sign out</button>';
+      $('btn-signout').onclick=function(){AUTH.signOut();};
+      gateOff();startData();
+      if(ROLE==='admin')startTeam();
+    }).catch(function(e){
+      var denied=e&&e.code==='permission-denied';
+      gate('<h2>'+(denied?'No access yet':'Could not connect')+'</h2><p class="cap">'+(denied?'You are signed in as <b>'+esc(ME)+'</b>, but this address is not on the team list. Ask an admin to add it under Data, backup and restore \u203a Team access.':'The database could not be reached ('+esc(e&&e.code||'error')+'). Check your connection and reload.')+'</p><button type="button" class="btn" id="g-out">Sign in with a different account</button>');
+      $('g-out').onclick=function(){AUTH.signOut();};
+    });
+  });
+}
+function startData(){
+  DB=FS;LOADED={config:false,units:false,landlords:false,payments:false};synced={};
+  unsubs.push(FS.doc('config/main').onSnapshot(function(snap){
+    if(snap.exists){var d=snap.data();DATA.properties=(d.properties||[]).slice();DATA.propColors=Object.assign({},d.propColors||{});DATA.fx=Object.assign({USD:1330,EUR:1570},d.fx||{});synced['config/main']=stable(d);}
+    LOADED.config=true;onLoaded();
+  },subErr));
+  [['units','units'],['landlords','landlord'],['payments','payments']].forEach(function(pair){
+    unsubs.push(FS.collection(pair[0]).onSnapshot(function(snap){
+      Object.keys(synced).forEach(function(k){if(k.indexOf(pair[0]+'/')===0)delete synced[k];});
+      DATA[pair[1]]=snap.docs.map(function(d){var o=d.data();synced[pair[0]+'/'+d.id]=stable(o);var x=clone(o);x.id=x.id||d.id;return x;});
+      LOADED[pair[0]]=true;onLoaded();
+    },subErr));
+  });
+}
+/* ---------- team (admins) ---------- */
+var TEAM=[];
+function startTeam(){
+  $('team-box').hidden=false;
+  unsubs.push(FS.collection('members').onSnapshot(function(snap){
+    TEAM=snap.docs.map(function(d){var o=d.data();o.email=d.id;return o;}).sort(function(a,b){return a.email<b.email?-1:1;});
+    renderTeam();
+  },function(){$('team-box').hidden=true;}));
+}
+function renderTeam(){
+  var opts=function(r){return ['admin','editor','viewer'].map(function(x){return '<option value="'+x+'"'+(x===r?' selected':'')+'>'+x.charAt(0).toUpperCase()+x.slice(1)+'</option>';}).join('');};
+  $('team').innerHTML='<tr><th>Email</th><th>Name</th><th>Role</th><th></th></tr>'+TEAM.map(function(m){
+    var me=m.email===ME;
+    return '<tr><td>'+esc(m.email)+(me?' <span class="hint" style="display:inline">(you)</span>':'')+'</td><td>'+esc(m.name||'')+'</td><td><select class="sm" data-tm-role="'+esc(m.email)+'"'+(me?' disabled':'')+'>'+opts(m.role)+'</select></td><td>'+(me?'':'<button type="button" class="btn small danger" data-tm-del="'+esc(m.email)+'">Remove</button>')+'</td></tr>';
+  }).join('');
+}
+function initTeam(){
+  $('tm-add').addEventListener('click',function(){
+    var em=$('tm-email').value.trim().toLowerCase(),nm=$('tm-name').value.trim(),rl=$('tm-role').value;
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){$('tm-msg').textContent='Enter a valid email address.';return;}
+    FS.collection('members').doc(em).set({role:rl,name:nm||null,addedBy:ME,addedAt:new Date().toISOString()}).then(function(){$('tm-msg').textContent='Added. They can now sign in.';$('tm-email').value='';$('tm-name').value='';}).catch(function(e){$('tm-msg').textContent='Could not add ('+(e.code||'error')+').';});
+  });
+  $('team').addEventListener('change',function(e){var el=e.target.closest('[data-tm-role]');if(!el)return;FS.collection('members').doc(el.getAttribute('data-tm-role')).update({role:el.value}).catch(function(er){$('tm-msg').textContent='Could not change role ('+(er.code||'error')+').';});});
+  $('team').addEventListener('click',function(e){var b=e.target.closest('[data-tm-del]');if(!b)return;if(b.getAttribute('data-armed')!=='1'){b.setAttribute('data-armed','1');b.textContent='Confirm';return;}FS.collection('members').doc(b.getAttribute('data-tm-del')).delete().catch(function(er){$('tm-msg').textContent='Could not remove ('+(er.code||'error')+').';});});
+}
+/* ---------- JSON backup ---------- */
+function downloadBackup(){
+  var b={format:'vestates-lease-backup',version:1,exportedAt:new Date().toISOString(),config:cfgDoc(),units:DATA.units,landlords:DATA.landlord,payments:DATA.payments};
+  var blob=new Blob([JSON.stringify(b,null,1)],{type:'application/json'}),a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download='Vestates_Lease_Backup_'+stamp()+'.json';document.body.appendChild(a);a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},1000);
+}
+function restoreBackup(file){
+  if(!file)return;
+  if(!CAN_WRITE||!allLoaded()){status([{cls:'err',text:'You need editor access, and the data must have finished loading.'}],true);return;}
+  var r=new FileReader();
+  r.onload=function(){
+    var b;try{b=JSON.parse(r.result);}catch(e){status([{cls:'err',text:'That file is not a valid backup.'}],true);return;}
+    if(!b||b.format!=='vestates-lease-backup'||!Array.isArray(b.units)){status([{cls:'err',text:'That file is not a Vestates lease backup.'}],true);return;}
+    if(DATA.units.length&&!confirm('Replace all the data in this dashboard with the backup from '+(b.exportedAt||'the file').slice(0,10)+'? Everyone using the dashboard will see the change.'))return;
+    var c=b.config||{};
+    DATA={properties:c.properties||[],propColors:c.propColors||{},fx:Object.assign({USD:1330,EUR:1570},c.fx||{}),units:b.units||[],landlord:b.landlords||[],payments:b.payments||[]};
+    normalize(DATA);commit();
+    status([{cls:'ok',text:'Loaded '+DATA.units.length+' units, '+DATA.landlord.length+' head leases and '+DATA.payments.length+' payments. Saving to the database\u2026'}],true);
+  };
+  r.readAsText(file);
+}
+function paidYears(u){
+  if(u.status!=='occupied'||u.billing==='monthly')return 1;
+  var m=termMonths(u);
+  if(m===null)return 1;
+  var y=Math.round(m/12);
+  return y>=2?y:1;
+}
+function annualRent(u){return (u.rent||0)/paidYears(u);}
+function annualSc(u){return (u.sc||0)/paidYears(u);}
+function due(u){return annualRent(u)+annualSc(u);}
+/* ---------- payments (dated records, per lease term) ---------- */
+function termKey(u){return (u.start||'')+'|'+(u.end||'');}
+function rateOf(c){return c&&c!=='NGN'?(DATA.fx[c]||1):1;}
+function toNGN(a,c){return Math.round((+a||0)*rateOf(c));}
+function convert(a,from,to){return (from||'NGN')===(to||'NGN')?(+a||0):(+a||0)*rateOf(from)/rateOf(to);}
+function leaseCur(u){return u.currency&&u.currency!=='NGN'&&u.fxRent!=null?u.currency:'NGN';}
+function fmtM(n,c){return !c||c==='NGN'?full(n):fmtC(n,c);}
+function isMonthly(u){return u.billing==='monthly'&&u.monthly>0;}
+function addMonthsISO(iso,n){var d=new Date(iso+'T00:00:00');if(isNaN(d))return null;var day=d.getDate();d.setDate(1);d.setMonth(d.getMonth()+n);var last=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();d.setDate(Math.min(day,last));return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function monthsDue(u){
+  if(!u.start)return 0;var t=isoToday();if(t<u.start)return 0;
+  var n=0;while(n<600){var d=addMonthsISO(u.start,n);if(!d||d>t)break;if(u.end&&d>u.end)break;n++;}
+  return n;
+}
+function paidThrough(u){if(!isMonthly(u)||!u.start)return null;var k=Math.floor(paidCur(u)/u.monthly+1e-9);return k>0?nextDayBack(addMonthsISO(u.start,k)):null;}
+function nextDayBack(iso){var d=new Date(iso+'T00:00:00');d.setDate(d.getDate()-1);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function termDueCur(u){
+  if(isMonthly(u))return monthsDue(u)*u.monthly;
+  return leaseCur(u)==='NGN'?(u.rent||0)+(u.sc||0):(u.fxRent||0)+(u.fxSc||0);
+}
+function paysFor(u){var k=termKey(u);return DATA.payments.filter(function(p){return p.unitId===u.id&&p.term===k;}).sort(function(a,b){return a.date<b.date?-1:1;});}
+function paidCur(u){var c=leaseCur(u);return paysFor(u).reduce(function(s,p){return s+convert(p.amount,p.currency,c);},0);}
+function payStatus(u){
+  if(u.status!=='occupied'&&u.status!=='vacated')return '';
+  var d=termDueCur(u),p=paidCur(u);
+  if(isMonthly(u)&&d<=0)return 'Not due';
+  if(p<=0)return 'Unpaid';
+  if(p>=d-0.5)return 'Paid';
+  return 'Partial';
+}
+function priorTerms(u){
+  return (u.history||[]).filter(function(h){return (h.kind||'Renewed')==='Renewed'&&h.tenant===u.tenant&&h.start&&h.end;});
+}
+function termArrears(u,h){
+  var k=h.start+'|'+h.end,due=(h.rent||0)+(h.sc||0);
+  var paid=DATA.payments.filter(function(p){return p.unitId===u.id&&p.term===k;}).reduce(function(s,p){return s+toNGN(p.amount,p.currency);},0);
+  return Math.max(0,due-paid);
+}
+function arrears(u){return priorTerms(u).reduce(function(s,h){return s+termArrears(u,h);},0);}
+function owedNGN(u){var cur=termStarted(u)?Math.max(0,toNGN(termDueCur(u)-paidCur(u),leaseCur(u))):0;return cur+arrears(u);}
+function totalReceived(){return DATA.payments.reduce(function(s,p){return s+toNGN(p.amount,p.currency);},0);}
+function received(u){return u.status==='occupied'?toNGN(paidCur(u),leaseCur(u)):0;}
+function termStarted(u){var d=daysTo(u.start);return d!==null&&d<=0;}
+function fmtC(n,c){
+  if(!c||c==='NGN')return fmt(n);
+  n=+n||0;var sym=fxSymbol(c),a=Math.abs(n);
+  if(a>=1e6)return sym+(a/1e6).toFixed(2)+'m';
+  if(a>=1e3)return sym+(a/1e3).toFixed(a>=1e4?0:1)+'k';
+  return sym+Math.round(a);
+}
+function isoToday(){var d=todayDate();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function dueQuarter(iso){if(!iso)return -1;var d=new Date(iso+'T00:00:00');if(isNaN(d))return -1;d.setDate(d.getDate()+1);return Math.floor(d.getMonth()/3);}
+function nextDueISO(iso){var d=new Date(iso+'T00:00:00');if(isNaN(d))return null;d.setDate(d.getDate()+1);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+/* ---------- head leases ---------- */
+function headFor(prop){
+  var c=DATA.landlord.filter(function(l){return l.link===prop;});
+  if(!c.length)return null;
+  c.sort(function(a,b){return (b.end||'9999')<(a.end||'9999')?-1:1;});
+  return c[0];
+}
+function hlStatus(l){
+  if(!l.end)return {k:'none',lab:l.variable?'Variable, no end date':'No end date',cls:'b-later'};
+  var d=daysTo(l.end);
+  if(d<0)return {k:'ended',lab:'Ended '+dfmt(l.end),cls:'b-exp'};
+  if(d<=90)return {k:'d90',lab:'Ends in '+d+' day'+(d===1?'':'s'),cls:'b-30'};
+  if(d<=365)return {k:'d365',lab:'Ends '+dfmt(l.end),cls:'b-60'};
+  return {k:'ok',lab:'To '+dfmt(l.end),cls:'b-180'};
+}
+function unitHeadRisk(u){
+  if(u.status!=='occupied')return null;
+  var l=headFor(u.property);if(!l||!l.end)return null;
+  if(daysTo(l.end)<0)return 'ended';
+  if(u.end&&u.end>l.end)return 'past';
+  return null;
+}
+function bucket(days){
+  if(days===null)return null;
+  if(days<0)return 'exp';if(days<=30)return 'd30';if(days<=60)return 'd60';if(days<=90)return 'd90';if(days<=180)return 'd180';return null;
+}
+var BLAB={exp:'Expired',d30:'0\u201330 days',d60:'31\u201360 days',d90:'61\u201390 days',d180:'91\u2013180 days'};
+var BCLS={exp:'b-exp',d30:'b-30',d60:'b-60',d90:'b-90',d180:'b-180'};
+function rowsAll(){
+  return DATA.units.map(function(u,i){
+    var days=(u.status==='occupied')?daysTo(u.end):null,bk=bucket(days);
+    return {u:u,i:i,days:days,bucket:u.renewal==='Renewed'?null:bk,due:due(u),recv:received(u)};
+  });
+}
+function facts(){
+  var all=rowsAll();
+  var occ=all.filter(function(r){return r.u.status==='occupied';});
+  var vac=all.filter(function(r){return r.u.status==='vacant'||r.u.status==='vacated';});
+  var vtd=all.filter(function(r){return r.u.status==='vacated';});
+  var managed=all.filter(function(r){return r.u.status!=='not_managed';});
+  var rentTot=occ.reduce(function(s,r){return s+annualRent(r.u);},0);
+  var dueTot=occ.reduce(function(s,r){return s+r.due;},0);
+  var byProp={};
+  DATA.properties.forEach(function(p){byProp[p]={units:0,occ:0,vac:0,nm:0,rent:0};});
+  all.forEach(function(r){
+    var b=byProp[r.u.property];if(!b)return;b.units++;
+    if(r.u.status==='occupied'){b.occ++;b.rent+=annualRent(r.u);}else if(r.u.status==='vacant'||r.u.status==='vacated')b.vac++;else b.nm++;
+  });
+  return {all:all,occ:occ,vac:vac,vtd:vtd,managed:managed,rentTot:rentTot,dueTot:dueTot,byProp:byProp};
+}
+function pc(p){return DATA.propColors[p]||'#888888';}
+function fxSymbol(c){return c==='USD'?'$':(c==='EUR'?'\u20AC':'');}
+function termMonths(u){
+  if(!u.start||!u.end)return null;
+  var s=new Date(u.start+'T00:00:00'),e=new Date(u.end+'T00:00:00');
+  if(isNaN(s)||isNaN(e)||e<s)return null;
+  return Math.round(((e-s)/86400000+1)/30.4375);
+}
+function termLabel(m){
+  if(m===null)return '\u2013';
+  if(m<12)return m+' mo';
+  var y=Math.floor(m/12),r=m%12;
+  return y+' yr'+(y>1?'s':'')+(r?' '+r+' mo':'');
+}
+function incomeByQuarter(F){
+  var q=[0,0,0,0],cnt=[0,0,0,0],byProp={},noEnd=0,noEndN=0;
+  DATA.properties.forEach(function(p){byProp[p]=[0,0,0,0];});
+  F.occ.forEach(function(r){
+    if(isMonthly(r.u)){var qv=r.due/4;for(var k=0;k<4;k++){q[k]+=qv;if(byProp[r.u.property])byProp[r.u.property][k]+=qv;}return;}
+    var i=dueQuarter(r.u.end);
+    if(i<0){noEnd+=r.due;noEndN++;return;}
+    q[i]+=r.due;cnt[i]++;
+    if(byProp[r.u.property])byProp[r.u.property][i]+=r.due;
+  });
+  return {q:q,cnt:cnt,byProp:byProp,noEnd:noEnd,noEndN:noEndN,total:q[0]+q[1]+q[2]+q[3]};
+}
+
+/* ---------- header, tabs ---------- */
+function chrome(F){
+  var d=todayDate(),iso=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  $('sub').textContent=DATA.properties.length+' properties, '+DATA.units.length+' units \u2014 as of '+dfmt(iso);
+  $('foot').textContent='Tenant names and phone numbers are hidden until you choose to show them. Amounts are in naira (\u20A6) unless marked; dollar and euro amounts use the rates under Exchange rates. Edits and payment records are shared with everyone who uses this dashboard.';
+}
+function balance(F){
+  var received_=0,paid=0,partial=0,unpaid=0,out=0,last30=0,t=isoToday(),c30=new Date(todayDate()-30*86400000).toISOString().slice(0,10);
+  var arr=0;
+  F.occ.forEach(function(r){
+    var st=payStatus(r.u);
+    if(st==='Paid')paid++;else if(st==='Partial')partial++;else if(st==='Unpaid')unpaid++;
+    out+=owedNGN(r.u);arr+=arrears(r.u);
+  });
+  received_=totalReceived();
+  DATA.payments.forEach(function(p){if(p.date>=c30&&p.date<=t)last30+=toNGN(p.amount,p.currency);});
+  var owedOut=0;F.vtd.forEach(function(r){owedOut+=owedNGN(r.u);});
+  $('bal-amt').textContent=full(received_);
+  $('bal-sub').textContent=paid+' paid, '+partial+' partial, '+unpaid+' unpaid. '+fmt(out)+' outstanding'+(arr>0?' (including '+fmt(arr)+' carried over from earlier terms)':'')+'. '+fmt(last30)+' received in the last 30 days.'+(owedOut>0?' '+fmt(owedOut)+' still owed by tenants who have moved out.':'');
+}
+function landlordTotals(){
+  var q=[0,0,0,0],varN=0,vars=[[],[],[],[]];
+  DATA.landlord.forEach(function(l){
+    for(var i=0;i<4;i++){
+      if(typeof l.dues[i]==='number')q[i]+=toNGN(l.dues[i],l.currency);
+      if(l.dueVar[i]){varN++;vars[i].push(l.property);}
+    }
+  });
+  return {q:q,total:q[0]+q[1]+q[2]+q[3],varN:varN,vars:vars};
+}
+function landlordBox(){
+  var T=landlordTotals();
+  $('tl-amt').textContent=full(T.total);
+  $('tl-sub').textContent=DATA.landlord.length+' landlord entries'+(T.varN?' \u00b7 '+T.varN+' unspecified amount'+(T.varN===1?'':'s')+' not counted':'');
+}
+function setTab(t){
+  state.tab=t;
+  ['tenants','landlords'].forEach(function(n){
+    $('tab-'+n).hidden=(n!==t);
+    $('tabbtn-'+n).setAttribute('aria-selected',n===t?'true':'false');
+  });
+  $('box-tenant').hidden=(t!=='tenants');
+
+  $('box-land').hidden=(t!=='landlords');
+}
+
+/* ---------- head lease alerts ---------- */
+function hlAlert(F){
+  var ended={},endedN=0,past=0;
+  F.occ.forEach(function(r){var k=unitHeadRisk(r.u);if(k==='ended'){endedN++;ended[r.u.property]=1;}else if(k==='past')past++;});
+  if(!endedN&&!past){$('hl-alert').innerHTML='';return;}
+  var props=Object.keys(ended),parts=[];
+  if(endedN)parts.push('<b>'+endedN+' occupied unit'+(endedN===1?' is':'s are')+'</b> in '+(props.length===1?'a property':props.length+' properties')+' whose head lease from the landlord has ended ('+esc(props.join('; '))+').');
+  if(past)parts.push('<b>'+past+' tenant lease'+(past===1?' runs':'s run')+'</b> past the end of the head lease.');
+  $('hl-alert').innerHTML='<div class="alert" role="status"><p>'+parts.join(' ')+'</p><button type="button" class="btn small" data-go="landlords">Review head leases</button></div>';
+}
+function ltiles(){
+  var c={ended:0,d90:0,d365:0,past:0},aff={ended:0,d90:0,d365:0,past:0};
+  DATA.landlord.forEach(function(l){var k=hlStatus(l).k;if(c.hasOwnProperty(k))c[k]++;});
+  DATA.units.forEach(function(u){
+    if(u.status!=='occupied')return;var l=headFor(u.property);if(!l)return;
+    var k=hlStatus(l).k;if(k==='ended'||k==='d90'||k==='d365')aff[k]++;
+    if(unitHeadRisk(u)==='past'){aff.past++;}
+  });
+  DATA.landlord.forEach(function(l){if(DATA.units.some(function(u){return u.property===l.link&&unitHeadRisk(u)==='past';}))c.past++;});
+  var defs=[['ended','Head leases ended','--exp',aff.ended+' occupied unit'+(aff.ended===1?'':'s')+' affected'],
+            ['d90','Ending within 90 days','--d30',aff.d90+' occupied unit'+(aff.d90===1?'':'s')+' affected'],
+            ['d365','Ending in 91 days to a year','--d60',aff.d365+' occupied unit'+(aff.d365===1?'':'s')+' affected'],
+            ['past','Tenants past head-lease end','--info',aff.past+' tenant lease'+(aff.past===1?'':'s')+' at '+c.past+' propert'+(c.past===1?'y':'ies')]];
+  $('ltiles').innerHTML=defs.map(function(d){
+    var on=state.ltile===d[0],n=d[0]==='past'?aff.past:c[d[0]];
+    return '<button type="button" class="tile" data-lt="'+d[0]+'" aria-pressed="'+on+'" style="--c:var('+d[2]+')"><div class="lab">'+d[1]+'</div><div class="n">'+n+'</div><div class="v">'+d[3]+'</div></button>';
+  }).join('');
+}
+/* ---------- tenants page ---------- */
+function tiles(F){
+  var order=['exp','d30','d60','d90','d180'],counts={},sums={};
+  order.forEach(function(b){counts[b]=0;sums[b]=0;});
+  F.all.forEach(function(r){if(r.bucket){counts[r.bucket]++;sums[r.bucket]+=r.due;}});
+  var cv={exp:'--exp',d30:'--d30',d60:'--d60',d90:'--d90',d180:'--d180'};
+  $('tiles').innerHTML=order.map(function(b){
+    var on=state.tile===b;
+    return '<button type="button" class="tile" data-b="'+b+'" aria-pressed="'+on+'" style="--c:var('+cv[b]+')">'+
+      '<div class="lab">'+BLAB[b]+'</div><div class="n">'+counts[b]+'</div><div class="v">'+fmt(sums[b])+'</div></button>';
+  }).join('');
+}
+function verdict(F){
+  if(!DATA.units.length){$('verdict').textContent=OFFLINE?'Sign in to load the lease data.':'No leases yet. Add a unit, or restore a backup (.json) or spreadsheet under Data, backup and restore at the bottom of the page.';return;}
+  var exp=F.all.filter(function(r){return r.bucket==='exp';}).length;
+  var d30=F.all.filter(function(r){return r.bucket==='d30';}).length;
+  var uns=F.all.filter(function(r){return r.days!==null&&r.days>=0&&r.days<=365&&r.u.renewal!=='Renewed';});
+  var uv=uns.reduce(function(s,r){return s+r.due;},0);
+  var rate=F.managed.length?Math.round(F.occ.length/F.managed.length*100):0;
+  var v=exp+' lease'+(exp===1?'':'s')+' '+(exp===1?'has already passed its end date':'have already passed their end dates');
+  v+=d30?(', and '+d30+' more expire'+(d30===1?'s':'')+' in the next 30 days.'):'.';
+  v+=' Occupancy across managed units is <b>'+rate+'%</b>, and '+fmt(uv)+' in rent from leases ending within 12 months is not yet marked renewed.';
+  $('verdict').innerHTML=v;
+}
+function kpis(F){
+  var rate=F.managed.length?F.occ.length/F.managed.length:0;
+  var avg=F.occ.length?F.rentTot/F.occ.length:0;
+  var multi=F.occ.filter(function(r){var m=termMonths(r.u);return m!==null&&m>=24;});
+  var items=[
+    ['Occupancy (managed units)',Math.round(rate*100)+'%'],
+    ['Empty units',F.vac.length+' of '+F.managed.length+(F.vtd.length?' \u00b7 '+F.vtd.length+' moved out':'')],
+    ['Contracted rent / year',fmt(F.rentTot)],
+    ['Rent / month (\u00f712)',fmt(F.rentTot/12)],
+    ['Est. rent lost / month (vacant)',fmt(F.vac.length*avg/12)],
+    ['Leases of 2+ years',multi.length+' \u00b7 '+fmt(multi.reduce(function(s,r){return s+r.due;},0))+' / yr']
+  ];
+  $('kpis').innerHTML=items.map(function(k){return '<div class="kpi"><div class="lab">'+k[0]+'</div><div class="bval">'+k[1]+'</div></div>';}).join('');
+}
+function passFilter(r){
+  var u=r.u;
+  if(state.tile&&r.bucket!==state.tile)return false;
+  if(state.prop&&u.property!==state.prop)return false;
+  if(state.status&&u.status!==state.status)return false;
+  if(state.qtr){if(u.status!=='occupied'||!u.end||qKey(u.end)!==state.qtr)return false;}
+  if(state.rstat){if(state.rstat==='__none'){if(u.renewal)return false;}else if(state.rstat==='__leaving'){if(u.renewal!=='Leaving'&&u.renewal!=='Notice given')return false;}else if(u.renewal!==state.rstat)return false;}
+  if(state.pay){
+    if(u.status!=='occupied')return false;
+    var ps=payStatus(u);
+    if(state.pay==='unpaid'){if(ps!=='Unpaid')return false;}else if(ps!==state.pay)return false;
+  }
+  if(state.term){
+    if(u.status!=='occupied')return false;
+    var tm=termMonths(u);
+    if(state.term==='multi'){if(tm===null||tm<24)return false;}
+    else if(state.term==='short'){if(tm===null||tm>=24)return false;}
+    else if(state.term==='nodates'){if(tm!==null)return false;}
+  }
+  if(state.q){
+    var s=u.unit+' '+u.property+(state.showContact?' '+(u.tenant||''):'');
+    if(s.toLowerCase().indexOf(state.q)<0)return false;
+  }
+  return true;
+}
+function qKey(iso){return iso.slice(0,4)+'-Q'+(Math.floor((+iso.slice(5,7)-1)/3)+1);}
+function qLabel(k){var n=['Jan\u2013Mar','Apr\u2013Jun','Jul\u2013Sep','Oct\u2013Dec'][+k.slice(-1)-1];return k.slice(-2)+' '+k.slice(0,4)+' ('+n+')';}
+var STLAB={occupied:'Occupied',vacant:'Vacant',vacated:'Vacated',not_managed:'Not managed'};
+function termBadge(u){
+  if(u.status!=='occupied')return '\u2013';
+  if(isMonthly(u))return '<span class="badge b-multi" title="Pays monthly">Monthly</span>'+(u.end?'<div class="hint">to '+dfmt(u.end)+'</div>':'<div class="hint">Rolling</div>');
+  var m=termMonths(u);
+  if(m===null)return '\u2013';
+  return m>=24?'<span class="badge b-multi" title="Lease of 2 years or more">'+termLabel(m)+'</span>':termLabel(m);
+}
+function contactCell(u){
+  var parts=[];
+  if(u.phone)parts.push('<button type="button" class="contact-btn" data-act="copy" data-ph="'+esc(u.phone)+'" title="Click to copy">'+esc(u.phone)+'</button>');
+  if(u.email)parts.push('<button type="button" class="contact-btn" data-act="copy" data-ph="'+esc(u.email)+'" title="Click to copy">'+esc(u.email)+'</button>');
+  return parts.length?parts.join('<br>'):'\u2013';
+}
+function inReminderWindow(u){
+  if(u.status!=='occupied'||u.renewal==='Renewed'||!u.end)return false;
+  var days=daysTo(u.end);
+  return days!==null&&days<=90;
+}
+function reminderText(u,days){
+  var subject='Lease renewal reminder \u2013 '+u.property+', '+u.unit;
+  var when=days<0?('ended '+Math.abs(days)+' day'+(Math.abs(days)===1?'':'s')+' ago'):('in '+days+' day'+(days===1?'':'s')+' ('+dfmt(u.end)+')');
+  var body='Dear '+(u.tenant||'Sir/Madam')+',\n\nThis is a reminder that the lease for '+u.unit+', '+u.property+' is due to end '+when+'. Kindly reach out to us at your earliest convenience to discuss renewal.\n\nBest regards,\nVestates';
+  return {subject:subject,body:body};
+}
+function sendReminder(u){
+  if(!u.email)return;
+  var days=daysTo(u.end),m=reminderText(u,days);
+  var url='mailto:'+encodeURIComponent(u.email)+'?subject='+encodeURIComponent(m.subject)+'&body='+encodeURIComponent(m.body);
+  window.open(url,'_blank');
+}
+function reminderCell(u){
+  if(u.status!=='occupied')return '<td>\u2013</td>';
+  var active=inReminderWindow(u);
+  var reason=!u.email?'No email on file':(active?'Email a renewal reminder':'Available once the lease is within its final 3 months');
+  return '<td><button type="button" class="btn small'+(active?' primary':'')+'" data-act="remind" data-id="'+esc(u.id)+'"'+(active&&u.email?'':' disabled')+' title="'+esc(reason)+'">Send reminder</button></td>';
+}
+function unitRow(r){
+  var u=r.u,occ=u.status==='occupied',vtd=u.status==='vacated',id=esc(u.id);
+  var badge=vtd?'<span class="badge b-vac">Vacated</span>'+(u.vacatedOn?'<div class="hint">Moved out '+dfmt(u.vacatedOn)+'</div>':''):
+    !occ?'<span class="badge b-later">'+(u.status==='vacant'?'Vacant':'Not managed')+'</span>':
+    r.bucket?'<span class="badge '+BCLS[r.bucket]+'">'+BLAB[r.bucket]+'</span>':
+    (u.renewal==='Renewed'?'<span class="badge b-180">Renewed</span>':(isMonthly(u)&&!u.end?'<span class="badge b-later">Rolling monthly</span>':'<span class="badge b-later">Later / no date</span>'));
+  var hr=unitHeadRisk(u);
+  if(hr)badge+='<span class="hl-sub"><span class="badge '+(hr==='ended'?'b-exp':'b-60')+'" title="'+(hr==='ended'?'Our lease from the landlord for this property has ended':'This tenant lease ends after our head lease does')+'">'+(hr==='ended'?'Head lease ended':'Past head lease')+'</span></span>';
+  var contact=state.showContact?('<td>'+contactCell(u)+'</td>'):'';
+  var rOpts=['','In talks','Renewed','Leaving','Notice given'].map(function(o){return '<option value="'+o+'"'+(o===u.renewal?' selected':'')+'>'+(o==='Renewed'&&u.renewal!=='Renewed'?'Renewed\u2026':(o||'Not started'))+'</option>';}).join('')+'<option value="__vacate">Moved out\u2026</option>';
+  var renHint=occ&&u.lastRenewal?'<div class="hint">Renewed '+dfmt(u.lastRenewal.on)+(u.lastRenewal.months?' for '+termLabel(u.lastRenewal.months):'')+'</div>':'';
+  var pst=payStatus(u);var pcls={Paid:'b-180',Partial:'b-60',Unpaid:'b-later'}[pst]||'b-later',lc=leaseCur(u);
+  var mon=isMonthly(u),pt=mon?paidThrough(u):null,behind=mon?Math.max(0,termDueCur(u)-paidCur(u)):0;
+  if(mon)pcls=pst==='Paid'?'b-180':(pst==='Not due'?'b-later':(behind>0?'b-exp':'b-later'));
+  var arrU=(occ||vtd)?arrears(u):0;
+  var payCell=(occ||vtd)?'<div class="pay-cell"><span class="badge '+pcls+'">'+(mon&&pst==='Paid'?'Up to date':(mon&&pst!=='Not due'?'Behind':pst))+'</span><span class="left-amt">'+(mon?(pt?'Paid to '+dfmt(pt):'Nothing paid yet')+(behind>0?' \u00b7 '+fmtC(behind,lc)+' due':''):fmtC(paidCur(u),lc)+' of '+fmtC(termDueCur(u),lc))+'</span><button type="button" class="btn small" data-act="pay" data-id="'+id+'">Payments</button>'+(arrU>0?'<div class="hint" style="color:var(--exp);width:100%">+ '+fmt(arrU)+' unpaid from an earlier term</div>':'')+'</div>':'\u2013';
+  var stc=occ&&u.renewal==='In talks'?' st-talks':(occ&&(u.renewal==='Leaving'||u.renewal==='Notice given')?' st-leaving':'');
+  return '<tr class="pr'+(vtd?' vacated':'')+stc+'" style="--pc:'+pc(u.property)+'">'+
+    '<td>'+esc(u.property)+'</td><td>'+esc(u.unit)+'</td><td>'+(u.tenant?esc(dispName(u.tenant,u.type)):'\u2014')+'</td><td>'+badge+'</td>'+
+    '<td>'+dfmt(u.end)+'</td><td>'+termBadge(u)+'</td><td class="num" title="'+(occ?esc(full(r.due)):'')+'">'+(occ?fmt(r.due):'\u2013')+(occ&&u.currency!=='NGN'?'<span class="fx-native">'+fxSymbol(u.currency)+(u.fxRent+(u.fxSc||0)).toLocaleString('en-US')+' '+u.currency+'</span>':'')+(occ&&isMonthly(u)?'<span class="fx-native">'+esc(fmtM(u.monthly,leaseCur(u)))+' a month</span>':'')+(occ&&paidYears(u)>1?'<span class="fx-native">Paid '+paidYears(u)+' yrs upfront \u2014 '+fmt(u.rent+(u.sc||0))+' total \u00f7 '+paidYears(u)+'</span>':'')+'</td>'+contact+
+    '<td>'+(vtd?'<button type="button" class="btn small w-only" data-act="relet" data-id="'+id+'">Re-let unit</button>':'')+(occ?'<select class="sm'+(stc===' st-talks'?' r-talks':(stc===' st-leaving'?' r-leaving':''))+'" data-act="renewal" data-id="'+id+'" aria-label="Renewal status">'+rOpts+'</select>'+renHint:(vtd?'':'\u2013'))+'</td>'+
+    '<td>'+payCell+'</td>'+
+    '<td><input class="note-in" type="text" data-act="note" data-id="'+id+'" value="'+esc(u.note)+'" placeholder="Add a note" aria-label="Note"></td>'+
+    reminderCell(u)+
+    '<td><button type="button" class="btn small w-only" data-act="edit" data-id="'+id+'">Edit</button></td></tr>';
+}
+function listRows(){
+  var all=rowsAll().filter(passFilter);
+  if(state.sort==='property'){
+    var order=DATA.properties;
+    all.sort(function(a,b){return order.indexOf(a.u.property)-order.indexOf(b.u.property)||a.i-b.i;});
+  }else{
+    all.sort(function(a,b){var av=a.days===null?1e9:a.days,bv=b.days===null?1e9:b.days;return av-bv||a.i-b.i;});
+  }
+  return all;
+}
+function landRows(){
+  return DATA.landlord.filter(function(l){
+    if(!state.ltile)return true;
+    if(state.ltile==='past')return DATA.units.some(function(u){return u.property===l.link&&unitHeadRisk(u)==='past';});
+    return hlStatus(l).k===state.ltile;
+  }).slice().sort(function(a,b){return (a.end||'9999')<(b.end||'9999')?-1:((a.end||'9999')>(b.end||'9999')?1:0);});
+}
+function qtrOptions(){
+  var c={},cur=qKey(isoToday());
+  DATA.units.forEach(function(u){if(u.status==='occupied'&&u.end){var k=qKey(u.end);c[k]=(c[k]||0)+1;}});
+  var keys=Object.keys(c).sort();if(state.qtr&&!c[state.qtr]){keys.push(state.qtr);keys.sort();c[state.qtr]=0;}
+  var past=keys.filter(function(k){return k<cur;}),fut=keys.filter(function(k){return k>=cur;});
+  var o=function(k){return '<option value="'+k+'"'+(k===state.qtr?' selected':'')+'>Ending '+esc(qLabel(k))+(k===cur?' \u2014 this quarter':'')+' ('+c[k]+')</option>';};
+  $('f-qtr').innerHTML='<option value="">All quarters</option>'+(fut.length?'<optgroup label="This quarter and later">'+fut.map(o).join('')+'</optgroup>':'')+(past.length?'<optgroup label="Already ended">'+past.slice().reverse().map(o).join('')+'</optgroup>':'');
+}
+function renderList(){
+  qtrOptions();
+  var all=listRows();
+  var nT=0,nL=0;DATA.units.forEach(function(u){if(u.status!=='occupied')return;if(u.renewal==='In talks')nT++;else if(u.renewal==='Leaving'||u.renewal==='Notice given')nL++;});
+  $('lg-talks').textContent='('+nT+')';$('lg-leave').textContent='('+nL+')';
+  [].forEach.call($('rlegend').querySelectorAll('button'),function(b){b.setAttribute('aria-pressed',String(state.rstat===b.getAttribute('data-rs')));});
+  var head='<tr><th>Property</th><th>Unit</th><th>Tenant</th><th>Expiry</th><th>End date</th><th>Term</th><th class="num">Due / year</th>'+
+    (state.showContact?'<th>Contact</th>':'')+'<th>Renewal</th><th>Payment this term</th><th>Note</th><th>Reminder</th><th></th></tr>';
+  var cols=state.showContact?13:12;
+  $('list').innerHTML=head+(all.length?all.map(unitRow).join(''):'<tr><td colspan="'+cols+'" class="cap" style="padding:14px 8px">No leases match this filter.</td></tr>');
+  $('count-cap').textContent=all.length+' lease'+(all.length===1?'':'s')+' shown';
+}
+function fillPropFilter(){
+  var el=$('f-prop');
+  if(state.prop&&DATA.properties.indexOf(state.prop)<0)state.prop='';
+  el.innerHTML='<option value="">All properties</option>'+DATA.properties.map(function(p){return '<option value="'+esc(p)+'"'+(p===state.prop?' selected':'')+'>'+esc(p)+'</option>';}).join('');
+}
+function pcards(F){
+  $('pcards').innerHTML=DATA.properties.map(function(p){
+    var b=F.byProp[p],rate=b.units-b.nm>0?Math.round(b.occ/(b.units-b.nm)*100):0;
+    return '<button type="button" class="pcard" data-p="'+esc(p)+'" style="--pc:'+pc(p)+'" aria-pressed="'+(state.prop===p)+'"><div class="nm">'+esc(p)+'</div>'+
+      '<div class="pbar"><i style="width:'+rate+'%"></i></div><div class="meta"><span>'+(b.units?rate+'% occupied':'No units')+'</span><span>'+b.vac+' empty</span></div></button>';
+  }).join('');
+}
+function propBreakdown(counts){
+  var keys=Object.keys(counts).sort(function(a,b){return counts[b]-counts[a]||a.localeCompare(b);});
+  if(keys.length===1&&counts[keys[0]]===1)return keys[0];
+  return keys.map(function(k){return counts[k]+' '+k;}).join(', ');
+}
+function conc(F){
+  var map={};
+  F.occ.forEach(function(r){
+    var nm=(r.u.group||r.u.tenant||'').trim();if(!nm)return;
+    var k=nm.toLowerCase();
+    if(!map[k])map[k]={name:nm,type:r.u.type,rent:0,units:0,props:{}};
+    map[k].rent+=annualRent(r.u);map[k].units++;
+    map[k].props[r.u.property]=(map[k].props[r.u.property]||0)+1;
+  });
+  var top=Object.keys(map).map(function(k){return map[k];}).sort(function(a,b){return b.rent-a.rent;}).slice(0,5);
+  var total=F.rentTot||1;
+  $('cap-conc').textContent='Top 5 tenants by rent, out of '+F.occ.length+' occupied units. Units set to "Same company as" are counted together.';
+  $('conc').innerHTML=top.map(function(t){
+    var p=Math.round(t.rent/total*100);
+    return '<tr><td style="width:42%">'+esc(dispName(t.name,t.type))+'<div style="color:var(--muted);font-size:11px">'+esc(propBreakdown(t.props))+'</div></td>'+
+      '<td style="width:36%"><div class="bar"><i style="width:'+p+'%"></i></div></td><td class="num" style="width:22%">'+fmt(t.rent)+' ('+p+'%)</td></tr>';
+  }).join('');
+  var types={Individual:0,Company:0,Embassy:0,Other:0};
+  F.occ.forEach(function(r){var t=types.hasOwnProperty(r.u.type)?r.u.type:'Other';types[t]++;});
+  var cols={Individual:'--info',Company:'--d180',Embassy:'--d30',Other:'--muted'};
+  var keys=Object.keys(types).filter(function(k){return types[k]>0;}),n=F.occ.length||1;
+  $('split').innerHTML=keys.map(function(k){return '<span style="width:'+(types[k]/n*100)+'%;background:var('+cols[k]+')"></span>';}).join('');
+  $('split-key').innerHTML=keys.map(function(k){return '<span><i style="background:var('+cols[k]+')"></i>'+k+' ('+types[k]+')</span>';}).join('');
+}
+function followUp(){
+  var d=rowsAll().filter(function(r){return r.bucket&&r.u.status==='occupied';}).sort(function(a,b){return a.days-b.days;});
+  var lines=d.map(function(r){return '- '+dispName(r.u.tenant,r.u.type)+' ('+r.u.property+', '+r.u.unit+'): ends '+dfmt(r.u.end)+', '+fmt(r.due)+(r.u.renewal?', status: '+r.u.renewal:'');});
+  copyText('Leases to follow up ('+d.length+'):\n'+lines.join('\n'),function(){var b=$('btn-copy'),o=b.textContent;b.textContent='Copied';setTimeout(function(){b.textContent=o;},1200);});
+}
+
+/* ---------- landlords page ---------- */
+function quarterTenantsHTML(i,propFilter){
+  var F=facts(),names=['January\u2013March','April\u2013June','July\u2013September','October\u2013December'];
+  var list=F.occ.filter(function(r){
+    if(isMonthly(r.u))return !propFilter||r.u.property===propFilter;
+    if(dueQuarter(r.u.end)!==i)return false;
+    return !propFilter||r.u.property===propFilter;
+  });
+  list.sort(function(a,b){return b.due-a.due;});
+  var qd=function(r){return isMonthly(r.u)?r.due/4:r.due;};
+  var total=list.reduce(function(s,r){return s+qd(r);},0);
+  var rows=list.map(function(r){
+    var u=r.u;
+    return '<tr class="pr" style="--pc:'+pc(u.property)+'"><td>'+esc(u.property)+'</td><td>'+esc(u.unit)+'</td><td>'+esc(u.tenant?dispName(u.tenant,u.type):'\u2014')+'</td><td>'+(isMonthly(u)?'Monthly':dfmt(u.end))+'</td><td>'+(isMonthly(u)?'Every month':dfmt(nextDueISO(u.end)))+'</td><td class="num">'+fmt(qd(r))+(u.currency!=='NGN'?'<div class="fx-native">'+fxSymbol(u.currency)+(u.fxRent+(u.fxSc||0)).toLocaleString('en-US')+' '+u.currency+'</div>':'')+'</td></tr>';
+  }).join('');
+  var cap=(propFilter?esc(propFilter)+' \u2014 ':'')+'leases whose renewal rent falls due in '+names[i]+' (the day after the lease ends, any year).';
+  return '<p class="cap" style="margin:0 0 10px">'+cap+'</p>'+
+    (list.length?'<div style="max-height:52vh;overflow:auto"><table class="land"><tr><th>Property</th><th>Unit</th><th>Tenant</th><th>Lease ends</th><th>Rent due</th><th class="num">In this quarter</th></tr>'+rows+
+      '<tr class="tot"><td colspan="5">Total ('+list.length+' lease'+(list.length===1?'':'s')+')</td><td class="num">'+fmt(total)+'</td></tr></table></div>':
+      '<p class="cap">No occupied leases end in this quarter'+(propFilter?' for '+esc(propFilter):'')+'.</p>');
+}
+function quarters(F){
+  var T=landlordTotals(),I=incomeByQuarter(F);
+  var names=['Jan\u2013Mar','Apr\u2013Jun','Jul\u2013Sep','Oct\u2013Dec'];
+  $('qgrid').innerHTML=[0,1,2,3].map(function(i){
+    var inc=I.q[i],cost=T.q[i],net=inc-cost,pocket=net<0,vars=T.vars[i];
+    var none=DATA.landlord.every(function(l){return l.dues[i]===null&&!l.dueVar[i];});
+    return '<div class="qcard'+(pocket?' pocket':'')+'" data-act="qview" data-q="'+i+'" title="Click to see which tenants make up this income"><div class="qh">Q'+(i+1)+' ('+names[i]+')</div>'+
+      '<div class="row"><span>Expected income</span><b>'+fmt(inc)+'</b></div>'+
+      '<div class="row"><span>Renewals due</span><b>'+I.cnt[i]+'</b></div>'+
+      '<div class="row"><span>Landlord rent due</span><b>'+(none?'None entered':fmt(cost))+'</b></div>'+
+      '<div class="net"><span style="font-size:12px;color:var(--muted)">Net</span><span class="v" style="color:'+(pocket?'var(--exp)':'var(--ok)')+'">'+(net<0?'\u2212':'+')+fmt(Math.abs(net))+'</span></div>'+
+      (pocket?'<div class="flag">Paying from pocket this quarter</div>':'')+
+      (vars.length?'<div class="flag" style="color:var(--d60)">Unspecified rent for '+esc(vars.join(', '))+', not counted, so the cost is understated</div>':'')+
+      (none?'<div class="flag" style="color:var(--muted)">No landlord payments entered for this quarter</div>':'')+
+      '<div class="flag" style="color:var(--info)">See the '+I.cnt[i]+' tenant'+(I.cnt[i]===1?'':'s')+' behind this \u2192</div></div>';
+  }).join('');
+  $('cap-noend').textContent=I.noEndN?(I.noEndN+' occupied lease'+(I.noEndN===1?' has':'s have')+' no end date ('+fmt(I.noEnd)+' a year), so '+(I.noEndN===1?'it is':'they are')+' not counted in any quarter. Add the end date with Edit on the Tenants page.'):'';
+  var head='<tr><th>Property</th>'+[1,2,3,4].map(function(q){return '<th class="num">Q'+q+'</th>';}).join('')+'<th class="num">Total</th></tr>';
+  var body=DATA.properties.filter(function(p){var a=I.byProp[p];return a&&(a[0]||a[1]||a[2]||a[3]);}).map(function(p){
+    var a=I.byProp[p],s=a[0]+a[1]+a[2]+a[3];
+    return '<tr class="pr" style="--pc:'+pc(p)+'"><td>'+esc(p)+'</td>'+a.map(function(x,qi){return x?'<td class="num click" data-act="qview" data-q="'+qi+'" data-prop="'+esc(p)+'" title="Click to see which tenants">'+fmt(x)+'</td>':'<td class="num">\u2013</td>';}).join('')+'<td class="num"><b>'+fmt(s)+'</b></td></tr>';
+  }).join('');
+  var tot='<tr class="tot"><td>Total expected income</td>'+I.q.map(function(x){return '<td class="num">'+fmt(x)+'</td>';}).join('')+'<td class="num">'+fmt(I.total)+'</td></tr>';
+  $('inc-table').innerHTML=head+body+tot;
+}
+function landCell(l,i){
+  var a=l.dues[i],v=l.dueVar[i];
+  if(typeof a==='number')return fmtC(a,l.currency)+(l.currency&&l.currency!=='NGN'?'<span class="fx-native">'+fmt(toNGN(a,l.currency))+'</span>':'')+(v?' <span class="tag-var" title="Part of this amount is unspecified">+</span>':'');
+  if(v)return '<span class="tag-var">Unspecified</span>';
+  return '\u2013';
+}
+function landlordTable(){
+  var T=landlordTotals();
+  var head='<tr><th>Property (landlord register)</th><th>Landlord</th><th class="num">Rent on register</th><th>Head lease</th>'+
+    [1,2,3,4].map(function(q){return '<th class="num">Q'+q+' due</th>';}).join('')+'<th class="num">Scheduled / year (\u20A6)</th><th>Note</th><th></th></tr>';
+  var rowsL=landRows();
+  var body=rowsL.map(function(l){
+    var sched=l.dues.reduce(function(s,x){return s+(typeof x==='number'?toNGN(x,l.currency):0);},0),hs=hlStatus(l);
+    var occN=l.link?DATA.units.filter(function(u){return u.property===l.link&&u.status==='occupied';}).length:0;
+    var color=l.link&&DATA.propColors[l.link]?pc(l.link):null;
+    return '<tr'+(color?' class="pr" style="--pc:'+color+'"':'')+'><td>'+esc(l.property)+(l.link?'<div style="font-size:11px;color:var(--muted)">'+esc(l.link)+'</div>':'')+'</td><td>'+esc(l.landlord||'\u2013')+'</td>'+
+      '<td class="num">'+(l.variable?'<span class="tag-var">Variable</span>':(typeof l.amount==='number'?fmtC(l.amount,l.currency):'\u2013'))+(l.currency&&l.currency!=='NGN'?'<span class="tag-fx">'+esc(l.currency)+'</span>':'')+'</td>'+
+      '<td style="font-size:12px"><span class="badge '+hs.cls+'">'+esc(hs.lab)+'</span><div style="color:var(--muted);white-space:nowrap;margin-top:3px">'+(l.start?dfmt(l.start):'?')+' \u2013 '+(l.end?dfmt(l.end):'?')+(hs.k==='ended'&&occN?' \u00b7 '+occN+' tenant'+(occN===1?'':'s'):'')+'</div></td>'+
+      [0,1,2,3].map(function(i){return '<td class="num">'+landCell(l,i)+'</td>';}).join('')+
+      '<td class="num"><b>'+(sched?fmt(sched):'\u2013')+'</b></td>'+
+      '<td class="note-cell" title="'+esc(l.note)+'">'+esc(l.note)+'</td>'+
+      '<td><button type="button" class="btn small w-only" data-act="edit-land" data-id="'+esc(l.id)+'">Edit</button></td></tr>';
+  }).join('');
+  var tot='<tr class="tot"><td colspan="4">Total scheduled</td>'+T.q.map(function(x){return '<td class="num">'+fmt(x)+'</td>';}).join('')+'<td class="num">'+fmt(T.total)+'</td><td colspan="2"></td></tr>';
+  var tot2=state.ltile?'<tr><td colspan="11" class="cap" style="padding:10px 8px">Showing '+rowsL.length+' of '+DATA.landlord.length+' entries. Click the tile again to show all.</td></tr>':tot;
+  $('land').innerHTML=head+(DATA.landlord.length?(rowsL.length?body:'<tr><td colspan="11" class="cap" style="padding:14px 8px">No head leases in this group.</td></tr>')+tot2:'<tr><td colspan="11" class="cap" style="padding:14px 8px">No landlord entries yet. Use Add landlord entry.</td></tr>');
+}
+
+/* ---------- render ---------- */
+function renderAll(){
+  var F=facts();
+  chrome(F);fillPropFilter();
+  hlAlert(F);tiles(F);verdict(F);kpis(F);renderList();pcards(F);conc(F);
+  balance(F);landlordBox();ltiles();quarters(F);landlordTable();
+  setNote();
+}
+function commit(){if(!CAN_WRITE){renderAll();return;}renderAll();sync();}
+
+/* ---------- dialog engine ---------- */
+var dlg={onSave:null,onDelete:null,onChange:null,fields:[],armed:false};
+function fieldHTML(f){
+  var id='f_'+f.name,cls='f'+(f.full?' f-full':'')+(f.type==='checkbox'?' chk':'');
+  var v=f.value==null?'':f.value,h;
+  if(f.type==='select'){
+    h='<label for="'+id+'">'+esc(f.label)+'</label><select id="'+id+'">'+f.options.map(function(o){return '<option value="'+esc(o[0])+'"'+(String(o[0])===String(v)?' selected':'')+'>'+esc(o[1])+'</option>';}).join('')+'</select>';
+  }else if(f.type==='textarea'){
+    h='<label for="'+id+'">'+esc(f.label)+'</label><textarea id="'+id+'" rows="3">'+esc(v)+'</textarea>';
+  }else if(f.type==='checkbox'){
+    h='<label for="'+id+'"><input type="checkbox" id="'+id+'"'+(f.value?' checked':'')+'> '+esc(f.label)+'</label>';
+  }else{
+    h='<label for="'+id+'">'+esc(f.label)+'</label><input id="'+id+'" type="'+(f.type||'text')+'" value="'+esc(v)+'"'+(f.type==='number'?' min="0" step="any"':'')+(f.placeholder?' placeholder="'+esc(f.placeholder)+'"':'')+(f.datalist?' list="dl_'+f.name+'"':'')+'>';
+    if(f.datalist)h+='<datalist id="dl_'+f.name+'">'+f.datalist.map(function(o){return '<option value="'+esc(o)+'">';}).join('')+'</datalist>';
+    if(f.hint)h+='<div class="hint">'+esc(f.hint)+'</div>';
+  }
+  return '<div class="'+cls+'" id="w_'+f.name+'">'+h+'</div>';
+}
+function readVals(){
+  var o={};
+  dlg.fields.forEach(function(f){var el=$('f_'+f.name);if(!el)return;o[f.name]=f.type==='checkbox'?el.checked:el.value;});
+  return o;
+}
+function showEl(name,on){var w=$('w_'+name);if(w)w.hidden=!on;}
+function openDialog(title,fields,opts){
+  dlg=Object.assign({fields:fields,onSave:null,onDelete:null,onChange:null,armed:false},opts);
+  $('dlg-title').textContent=title;
+  $('dlg-body').innerHTML=fields.map(fieldHTML).join('');
+  $('dlg-err').textContent='';
+  var del=$('dlg-del');del.hidden=!opts.onDelete;del.textContent=opts.deleteLabel||'Delete';
+  $('dlg-cancel').hidden=false;$('dlg-save').textContent='Save';
+  if(dlg.onChange)dlg.onChange();
+  var d=$('dlg');if(d.open)return;if(typeof d.showModal==='function')d.showModal();else d.setAttribute('open','');
+}
+function openViewDialog(title,bodyHtml){
+  dlg={fields:[],onSave:null,onDelete:null,onChange:null,armed:false};
+  $('dlg-title').textContent=title;
+  $('dlg-body').innerHTML=bodyHtml;
+  $('dlg-err').textContent='';
+  $('dlg-del').hidden=true;
+  $('dlg-cancel').hidden=true;$('dlg-save').textContent='Close';
+  var d=$('dlg');if(d.open)return;if(typeof d.showModal==='function')d.showModal();else d.setAttribute('open','');
+}
+function closeDialog(){var d=$('dlg');if(typeof d.close==='function')d.close();else d.removeAttribute('open');}
+function initDialog(){
+  $('dlg-form').addEventListener('submit',function(e){
+    e.preventDefault();
+    var err=dlg.onSave?dlg.onSave(readVals()):null;
+    if(err){$('dlg-err').textContent=err;return;}
+    closeDialog();
+  });
+  $('dlg-cancel').addEventListener('click',closeDialog);
+  $('dlg').addEventListener('close',function(){if(renderPending){renderPending=false;scheduleRender();}});
+  $('dlg-body').addEventListener('change',function(){if(dlg.onChange)dlg.onChange();});
+  $('dlg-body').addEventListener('click',function(e){
+    var b=e.target.closest('[data-act="del-pay"]');if(!b)return;
+    if(b.getAttribute('data-armed')!=='1'){b.setAttribute('data-armed','1');b.textContent='Confirm';return;}
+    var pid=b.getAttribute('data-pid'),uid=b.getAttribute('data-uid2');
+    DATA.payments=DATA.payments.filter(function(p){return p.id!==pid;});commit();
+    var u=DATA.units.filter(function(x){return x.id===uid;})[0];
+    var hist=$('dlg-body').querySelector('.payhist');if(u&&hist){hist.outerHTML=payHistoryHTML(u);fillRecorders();}
+  });
+  $('dlg-del').addEventListener('click',function(){
+    var b=$('dlg-del');
+    if(!dlg.armed){dlg.armed=true;b.textContent='Click again to confirm';return;}
+    var err=dlg.onDelete?dlg.onDelete():null;
+    if(err){$('dlg-err').textContent=err;dlg.armed=false;b.textContent=dlg.deleteLabel||'Delete';return;}
+    closeDialog();
+  });
+}
+
+/* ---------- unit dialog ---------- */
+function groupNames(){
+  var seen={},out=[];
+  DATA.units.forEach(function(u){[u.group,u.tenant].forEach(function(n){if(n&&!seen[n.toLowerCase()]){seen[n.toLowerCase()]=1;out.push(n);}});});
+  return out.sort();
+}
+function openUnitDialog(id,mode){
+  var u=id?DATA.units.filter(function(x){return x.id===id;})[0]:null;
+  var relet=mode==='relet'&&u;
+  var v=u||{property:state.prop||DATA.properties[0]||'__new',unit:'',tenant:'',group:'',status:'occupied',type:'Individual',org:'',currency:'NGN',rent:'',sc:'',fxRent:null,fxSc:null,start:'',end:'',phone:'',email:''};
+  if(relet)v={property:u.property,unit:u.unit,tenant:'',group:'',status:'occupied',type:'Individual',org:'',currency:'NGN',rent:'',sc:'',fxRent:null,fxSc:null,start:'',end:'',phone:'',email:''};
+  var fields=[
+    {name:'property',label:'Property',type:'select',value:v.property,options:DATA.properties.map(function(p){return [p,p];}).concat([['__new','+ New property\u2026']])},
+    {name:'newProp',label:'New property name',type:'text'},
+    {name:'unit',label:'Unit',type:'text',value:v.unit,placeholder:'e.g. Flat 4'},
+    {name:'status',label:'Occupancy',type:'select',value:v.status,options:[['occupied','Occupied'],['vacated','Vacated (tenant has moved out)'],['vacant','Vacant'],['not_managed','Not managed by Vestates']]},
+    {name:'vacatedOn',label:'Moved out on',type:'date',value:v.vacatedOn||''},
+    {name:'tenant',label:'Tenant name',type:'text',value:v.tenant||'',full:true},
+    {name:'group',label:'Same company as (optional)',type:'text',value:v.group||'',full:true,placeholder:'e.g. Mota-Engil',hint:'Give every unit of the same company the same name here, even if the tenant names are spelled differently. They are then counted together in tenant concentration.',datalist:groupNames()},
+    {name:'type',label:'Tenant type',type:'select',value:v.type,options:[['Individual','Individual'],['Company','Company'],['Embassy','Embassy'],['Other','Other']]},
+    {name:'org',label:'Organisation / occupation',type:'text',value:v.org||''},
+    {name:'billing',label:'How they pay',type:'select',value:v.billing||'upfront',options:[['upfront','Upfront for the term'],['monthly','Monthly']]},
+    {name:'monthly',label:'Monthly fee',type:'number',value:v.monthly||'',hint:'In the rent currency. Service charge included.'},
+    {name:'currency',label:'Rent currency',type:'select',value:v.currency||'NGN',options:[['NGN','Naira (\u20A6)'],['USD','US Dollars ($)'],['EUR','Euros (\u20AC)']]},
+    {name:'rent',label:'Rent (\u20A6 per year)',type:'number',value:v.rent},
+    {name:'sc',label:'Service charge (\u20A6 per year)',type:'number',value:v.sc},
+    {name:'fxRent',label:'Rent (foreign currency per year)',type:'number',value:v.fxRent==null?'':v.fxRent},
+    {name:'fxSc',label:'Service charge (foreign currency per year)',type:'number',value:v.fxSc==null?'':v.fxSc},
+    {name:'fxNote',label:'',type:'text',value:'',full:true},
+    {name:'start',label:'Lease start',type:'date',value:v.start||''},
+    {name:'end',label:'Lease end',type:'date',value:v.end||''},
+    {name:'phone',label:'Phone',type:'text',value:v.phone||''},
+    {name:'email',label:'Email',type:'email',value:v.email||''}
+  ];
+  openDialog(relet?'Re-let '+u.property+', '+u.unit:(u?'Edit unit':'Add unit'),fields,{
+    onChange:function(){
+      var x=readVals(),vt=x.status==='vacated',occ=x.status==='occupied'||vt,isFx=x.currency&&x.currency!=='NGN';
+      showEl('newProp',x.property==='__new');
+      showEl('vacatedOn',vt);
+      ['tenant','group','type','org','billing','currency','rent','sc','fxRent','fxSc','fxNote','start','end','phone','email'].forEach(function(n){showEl(n,occ);});
+      var mon=occ&&x.billing==='monthly';showEl('monthly',mon);
+      if(occ){
+        showEl('rent',!isFx&&!mon);showEl('sc',!isFx&&!mon);
+        showEl('fxRent',isFx&&!mon);showEl('fxSc',isFx&&!mon);showEl('fxNote',isFx);
+        if(isFx){
+          var el=$('w_fxNote');if(el)el.querySelector('div,label,span')||(el.innerHTML='<p class="hint" style="margin:0">1 '+x.currency+' = \u20A6'+(DATA.fx[x.currency]||0).toLocaleString('en-US')+'. Change this under "Exchange rates". The Naira rent and service charge are calculated from this automatically.</p>');
+        }
+      }
+    },
+    onSave:function(x){
+      var prop=x.property;
+      if(prop==='__new'){
+        prop=x.newProp.trim();
+        if(!prop)return 'Enter a name for the new property.';
+        var ex=DATA.properties.filter(function(p){return p.toLowerCase()===prop.toLowerCase();})[0];
+        if(ex)prop=ex;
+      }
+      if(!x.unit.trim())return 'Enter a unit name or number.';
+      var vt=x.status==='vacated',occ=x.status==='occupied'||vt;
+      if(occ&&!x.tenant.trim())return vt?'Enter the name of the tenant who moved out, or set the unit to Vacant.':'Enter the tenant name, or set the unit to Vacant.';
+      if(vt&&!x.vacatedOn)return 'Enter the date the tenant moved out.';
+      var rent=toNum(x.rent),sc=toNum(x.sc);
+      if((rent!==null&&rent<0)||(sc!==null&&sc<0))return 'Rent and service charge cannot be negative.';
+      var isFx=occ&&x.currency&&x.currency!=='NGN';
+      var fxr=toNum(x.fxRent),fxs=toNum(x.fxSc);
+      var mon=occ&&x.billing==='monthly',mf=toNum(x.monthly);
+      if(mon&&(mf===null||mf<=0))return 'Enter the monthly fee.';
+      if(mon&&!x.start)return 'Enter the date the monthly payments start (lease start).';
+      if(isFx&&!mon){
+        if(fxr===null||fxr<=0)return 'Enter the rent in '+x.currency+'.';
+        if(fxs!==null&&fxs<0)return 'Service charge cannot be negative.';
+      }
+      if(occ&&x.start&&x.end&&x.end<x.start)return 'The lease end date is before the start date.';
+      if(DATA.properties.indexOf(prop)<0){DATA.properties.push(prop);DATA.propColors[prop]=nextColor(DATA);}
+      var t=u||{id:newId('u'),renewal:'',note:''};
+      if(u&&u.status==='vacated'&&x.status==='occupied'&&u.tenant){
+        t.history=(t.history||[]).concat([{kind:'Moved out',tenant:u.tenant,type:u.type,start:u.start||null,end:u.end||null,vacatedOn:u.vacatedOn||null,rent:u.rent,sc:u.sc,currency:u.currency}]);
+        if(relet)t.note='';
+      }
+      t.vacatedOn=vt?x.vacatedOn:null;
+      t.property=prop;t.unit=x.unit.trim();t.status=x.status;
+      t.tenant=occ?x.tenant.trim():null;t.group=occ?x.group.trim():'';t.type=x.type;t.org=occ?(x.org.trim()||null):null;
+      t.currency=occ?x.currency:'NGN';
+      if(isFx){t.fxRent=fxr;t.fxSc=fxs||0;t.rent=Math.round(fxr*(DATA.fx[x.currency]||1));t.sc=Math.round((fxs||0)*(DATA.fx[x.currency]||1));}
+      else{t.fxRent=null;t.fxSc=null;t.rent=occ?(rent||0):0;t.sc=occ?(sc||0):0;}
+      t.billing=mon?'monthly':'upfront';t.monthly=mon?mf:null;
+      if(mon){if(isFx){t.fxRent=mf*12;t.fxSc=0;t.rent=Math.round(mf*12*(DATA.fx[x.currency]||1));t.sc=0;}else{t.rent=mf*12;t.sc=0;}}
+      t.start=occ?(x.start||null):null;t.end=occ?(x.end||null):null;
+      if(x.status==='occupied')t.vacatedOn=null;
+      t.phone=occ?(x.phone.trim()||null):null;t.email=occ?(x.email.trim()||null):null;
+      if(!occ){t.renewal='';t.currency='NGN';t.fxRent=null;t.fxSc=null;}
+      if(vt)t.renewal='';
+      if(!u)DATA.units.push(t);
+      commit();return null;
+    },
+    onDelete:u&&!relet?function(){DATA.units=DATA.units.filter(function(x){return x.id!==u.id;});DATA.payments=DATA.payments.filter(function(p){return p.unitId!==u.id;});commit();return null;}:null,
+    deleteLabel:'Delete unit'
+  });
+}
+
+/* ---------- renewal dialog ---------- */
+function addYearsISO(iso,y){var d=new Date(iso+'T00:00:00');if(isNaN(d))return '';d.setFullYear(d.getFullYear()+y);d.setDate(d.getDate()-1);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function round2(n){return Math.round(n*100)/100;}
+function openRenewDialog(id){
+  var u=DATA.units.filter(function(x){return x.id===id;})[0];if(!u)return;
+  var lc=leaseCur(u),sym=lc==='NGN'?'\u20A6':lc,py=paidYears(u)||1;
+  var perRent=lc==='NGN'?(u.rent||0)/py:(u.fxRent||0)/py,perSc=lc==='NGN'?(u.sc||0)/py:(u.fxSc||0)/py;
+  var start=u.end?nextDueISO(u.end):isoToday(),yrs=Math.min(5,Math.max(1,py));
+  var auto={rent:round2(perRent*yrs),sc:round2(perSc*yrs),end:addYearsISO(start,yrs),paid:round2((perRent+perSc)*yrs)};
+  var last={years:String(yrs),start:start};
+  var fields=[
+    {name:'years',label:'Years paid for',type:'select',value:String(yrs),options:[['1','1 year'],['2','2 years'],['3','3 years'],['4','4 years'],['5','5 years'],['custom','Other (set the end date)']]},
+    {name:'start',label:'New term starts',type:'date',value:start},
+    {name:'end',label:'New term ends',type:'date',value:auto.end,hint:'The last day of the period they have paid for.'},
+    {name:'rent',label:'Rent for the whole term ('+sym+')',type:'number',value:auto.rent,hint:'Total for all the years, not per year.'},
+    {name:'sc',label:'Service charge for the whole term ('+sym+')',type:'number',value:auto.sc},
+    {name:'paid',label:'Amount paid ('+sym+')',type:'number',value:auto.paid,hint:'Leave empty if nothing has been paid yet.'},
+    {name:'date',label:'Date paid',type:'date',value:isoToday()},
+    {name:'method',label:'Method',type:'select',value:'Bank transfer',options:[['Bank transfer','Bank transfer'],['Cheque','Cheque'],['Cash','Cash'],['Card','Card'],['Other','Other']]},
+    {name:'ref',label:'Reference (optional)',type:'text',value:''},
+    {name:'perYear',label:'',type:'text',value:'',full:true}
+  ];
+  var oldLeft=Math.max(0,termDueCur(u)-paidCur(u));
+  if(oldLeft>0.5&&!isMonthly(u))fields.unshift({name:'settle',label:'The current term is fully paid (it was paid before payments were recorded here)',type:'checkbox',value:false,full:true});
+  openDialog('Renew lease \u2014 '+u.property+', '+u.unit,fields,{
+    onChange:function(){
+      var x=readVals();
+      var y=x.years==='custom'?null:parseInt(x.years,10);
+      if(y&&(x.years!==last.years||x.start!==last.start)&&x.start){
+        var ne=addYearsISO(x.start,y);
+        if($('f_end').value===auto.end||x.years!==last.years||x.start!==last.start){$('f_end').value=ne;}
+        if(toNum($('f_rent').value)===auto.rent){$('f_rent').value=round2(perRent*y);}
+        if(toNum($('f_sc').value)===auto.sc){$('f_sc').value=round2(perSc*y);}
+        var tot=round2((toNum($('f_rent').value)||0)+(toNum($('f_sc').value)||0));
+        if(toNum($('f_paid').value)===auto.paid)$('f_paid').value=tot;
+        auto={rent:toNum($('f_rent').value),sc:toNum($('f_sc').value),end:ne,paid:toNum($('f_paid').value)};
+      }
+      last={years:x.years,start:x.start};
+      x=readVals();
+      var w=$('w_perYear');
+      if(w){
+        var m=x.start&&x.end&&x.end>=x.start?Math.round((INT(x.end)-INT(x.start)+1)/30.4375):null,yy=m?Math.max(1,Math.round(m/12)):1;
+        var tot=(toNum(x.rent)||0)+(toNum(x.sc)||0),paid=toNum(x.paid)||0;
+        w.innerHTML='<p class="hint" style="margin:0">'+(m?'Term of '+esc(termLabel(m))+'. ':'')+'That is '+esc(fmtC(tot/yy,lc))+' a year including service charge'+(perRent+perSc>0?' (was '+esc(fmtC(perRent+perSc,lc))+' a year)':'')+'.'+(paid>0&&paid<tot-0.5?' '+esc(fmtC(tot-paid,lc))+' will still be outstanding.':'')+'</p>'+(function(){var hl=headFor(u.property);return hl&&hl.end&&x.end&&x.end>hl.end?'<p class="hint" style="margin:4px 0 0;color:var(--exp)">This runs past our head lease on '+esc(u.property)+', which ends '+dfmt(hl.end)+'.</p>':'';})();
+      }
+    },
+    onSave:function(x){
+      if(!x.start||!x.end)return 'Enter the start and end of the new term.';
+      if(x.end<x.start)return 'The new term ends before it starts.';
+      var rent=toNum(x.rent),sc=toNum(x.sc)||0,paid=toNum(x.paid);
+      if(rent===null||rent<0)return 'Enter the rent for the whole term.';
+      if(sc<0)return 'Service charge cannot be negative.';
+      if(paid!==null&&paid<0)return 'The amount paid cannot be negative.';
+      if(paid&&!x.date)return 'Enter the date it was paid.';
+      if(x.settle&&oldLeft>0.5)DATA.payments.push({id:newId('p'),unitId:u.id,term:termKey(u),date:u.start||isoToday(),amount:round2(oldLeft),currency:lc,method:'Other',ref:'',note:'Marked as paid at renewal (paid before records were kept here)',by:ME||null,byName:MYNAME||null,at:new Date().toISOString()});
+      u.history=(u.history||[]).concat([{kind:'Renewed',tenant:u.tenant,type:u.type,start:u.start||null,end:u.end||null,rent:u.rent,sc:u.sc,currency:u.currency,renewedOn:isoToday()}]);
+      u.start=x.start;u.end=x.end;
+      if(lc==='NGN'){u.rent=rent;u.sc=sc;}
+      else{u.fxRent=rent;u.fxSc=sc;u.rent=Math.round(rent*rateOf(lc));u.sc=Math.round(sc*rateOf(lc));}
+      var m=Math.round((INT(x.end)-INT(x.start)+1)/30.4375);
+      u.renewal='';u.lastRenewal={on:isoToday(),months:m};
+      if(paid)DATA.payments.push({id:newId('p'),unitId:u.id,term:termKey(u),date:x.date,amount:paid,currency:lc,method:x.method,ref:x.ref.trim(),note:'Renewal payment',by:ME||null,byName:MYNAME||null,at:new Date().toISOString()});
+      commit();return null;
+    }
+  });
+  $('dlg-save').textContent='Save renewal';
+  $('dlg-body').insertAdjacentHTML('afterbegin','<p class="cap f-full" style="margin:0">Current term: '+(u.start?dfmt(u.start):'?')+' \u2013 '+(u.end?dfmt(u.end):'?')+', '+esc(fmtC(termDueCur(u),lc))+' in total. Saving moves the lease onto the new dates, records the payment, and keeps the old term in the lease history.'+(oldLeft>0.5&&!isMonthly(u)?' <b>'+esc(fmtC(oldLeft,lc))+' of the current term is unpaid.</b> It will be carried over as arrears unless you tick the box below.':'')+'</p>');
+}
+function INT(iso){return Math.floor(new Date(iso+'T00:00:00').getTime()/86400000);}
+/* ---------- vacate dialog ---------- */
+function openVacateDialog(id){
+  var u=DATA.units.filter(function(x){return x.id===id;})[0];if(!u)return;
+  var left=Math.max(0,termDueCur(u)-paidCur(u));
+  openDialog('Mark as vacated \u2014 '+u.property+', '+u.unit,[
+    {name:'date',label:'Moved out on',type:'date',value:isoToday()},
+    {name:'note',label:'Note (optional)',type:'text',value:'',placeholder:'e.g. keys returned, deposit refunded',full:true}
+  ],{onSave:function(x){
+    if(!x.date)return 'Enter the date the tenant moved out.';
+    if(u.start&&x.date<u.start)return 'The move-out date is before the lease started.';
+    u.status='vacated';u.vacatedOn=x.date;u.renewal='';
+    if(x.note.trim())u.note=(u.note?u.note+' | ':'')+'Moved out: '+x.note.trim();
+    commit();return null;
+  }});
+  $('dlg-save').textContent='Mark as vacated';
+  $('dlg-body').insertAdjacentHTML('afterbegin','<p class="cap f-full" style="margin:0">'+esc(dispName(u.tenant||'The tenant',u.type))+' will be shown as moved out. The unit counts as empty from then on, and drops out of the expiry and cash-flow figures. Their details and payment records are kept'+(left>0?', including the unpaid balance of '+esc(fmtC(left,leaseCur(u)))+' for this term':'')+'. Use \u201cRe-let unit\u201d when a new tenant moves in.</p>');
+}
+/* ---------- payment dialog ---------- */
+function payHistoryHTML(u){
+  var lc=leaseCur(u),list=paysFor(u),due=termDueCur(u),paid=paidCur(u);
+  if(isMonthly(u)){var pt=paidThrough(u);var sum='<div class="paysum"><span>Monthly fee <b>'+esc(fmtM(u.monthly,lc))+'</b></span><span>Due so far <b>'+esc(fmtC(due,lc))+'</b><small class="hint">'+monthsDue(u)+' month'+(monthsDue(u)===1?'':'s')+' since '+dfmt(u.start)+'</small></span><span>Paid <b>'+esc(fmtC(paid,lc))+'</b></span><span>Paid to <b>'+(pt?dfmt(pt):'\u2013')+'</b></span></div>';}
+  else var sum='<div class="paysum"><span>Lease term <b>'+(u.start?dfmt(u.start):'?')+' \u2013 '+(u.end?dfmt(u.end):'?')+'</b></span><span>Due <b>'+esc(fmtC(due,lc))+'</b></span><span>Paid <b>'+esc(fmtC(paid,lc))+'</b></span><span>Balance <b>'+esc(fmtC(Math.max(0,due-paid),lc))+'</b></span></div>';
+  var older=DATA.payments.filter(function(p){return p.unitId===u.id&&p.term!==termKey(u);}).length;
+  var rows=list.map(function(p){
+    return '<tr><td>'+dfmt(p.date)+'</td><td class="num">'+esc(fmtC(p.amount,p.currency))+'</td><td>'+esc(p.method||'\u2013')+'</td><td>'+esc(p.ref||'')+(p.note?'<div class="hint">'+esc(p.note)+'</div>':'')+'</td><td>'+esc(p.byName||(p.by&&p.by.indexOf('@')>0?p.by:(p.by?'Earlier record':'\u2013')))+'</td>'+
+      '<td><button type="button" class="btn small danger w-only" data-act="del-pay" data-pid="'+esc(p.id)+'" data-uid2="'+esc(u.id)+'">Delete</button></td></tr>';
+  }).join('');
+  return '<div class="payhist">'+sum+(list.length?'<table><tr><th>Date</th><th class="num">Amount</th><th>Method</th><th>Reference</th><th>Recorded by</th><th></th></tr>'+rows+'</table>':'<p class="cap" style="margin:4px 0">No payments recorded for this lease term yet.</p>')+
+    (older?'<p class="hint">'+older+' payment'+(older===1?'':'s')+' from earlier lease terms are kept in the spreadsheet download.</p>':'')+(arrears(u)>0?'<p class="hint" style="color:var(--exp)">'+esc(fmt(arrears(u)))+' is still unpaid from an earlier term. Choose that term under \u201cPay towards\u201d to record it.</p>':'')+'</div>';
+}
+function fillRecorders(){
+  return;
+  var spans=[].slice.call($('dlg-body').querySelectorAll('[data-uid]')).filter(function(s){return s.getAttribute('data-uid');});
+  if(!spans.length)return;
+  var ids=spans.map(function(s){return s.getAttribute('data-uid');});
+  USER.profiles(ids).then(function(ps){spans.forEach(function(s){var p=ps[s.getAttribute('data-uid')];s.textContent=(p&&p.name)||'Someone';});});
+}
+function openPayDialog(id){
+  var u=DATA.units.filter(function(x){return x.id===id;})[0];if(!u)return;
+  var lc=leaseCur(u),title='Payments \u2014 '+u.property+', '+u.unit;
+  if(!CAN_WRITE){openViewDialog(esc(title),payHistoryHTML(u));$('dlg-title').textContent=title;fillRecorders();return;}
+  var left=isMonthly(u)?(Math.max(0,termDueCur(u)-paidCur(u))||u.monthly):Math.max(0,termDueCur(u)-paidCur(u));
+  var fields=[
+    {name:'date',label:'Date received',type:'date',value:isoToday()},
+    {name:'amount',label:'Amount ('+(lc==='NGN'?'\u20A6':lc)+')',type:'number',value:left?Math.round(left*100)/100:''},
+    {name:'method',label:'Method',type:'select',value:'Bank transfer',options:[['Bank transfer','Bank transfer'],['Cheque','Cheque'],['Cash','Cash'],['Card','Card'],['Other','Other']]},
+    {name:'ref',label:'Reference (optional)',type:'text',value:'',placeholder:'e.g. bank reference or receipt no.'},
+    {name:'note',label:'Note (optional)',type:'text',value:'',full:true}
+  ];
+  var owing=priorTerms(u).filter(function(h){return termArrears(u,h)>0;});
+  if(owing.length)fields.unshift({name:'towards',label:'Pay towards',type:'select',value:'',full:true,options:[['','Current term ('+(u.start?dtxt(u.start):'?')+' \u2013 '+(u.end?dtxt(u.end):'rolling')+')']].concat(owing.map(function(h){return [h.start+'|'+h.end,'Earlier term '+dtxt(h.start)+' \u2013 '+dtxt(h.end)+' (\u20A6'+Math.round(termArrears(u,h)).toLocaleString('en-US')+' unpaid)'];}))});
+  openDialog(title,fields,{onSave:function(x){
+    var amt=toNum(x.amount);
+    if(!x.date)return 'Enter the date the payment was received.';
+    if(amt===null||amt<=0)return 'Enter an amount greater than zero.';
+    if(!u.start||(!u.end&&!isMonthly(u)))return 'Add the lease start and end dates with Edit before recording payments.';
+    var tk=x.towards||termKey(u),pc_=x.towards?'NGN':lc;
+    DATA.payments.push({id:newId('p'),unitId:u.id,term:tk,date:x.date,amount:amt,currency:pc_,method:x.method,ref:x.ref.trim(),note:x.note.trim(),by:ME||null,byName:MYNAME||null,at:new Date().toISOString()});
+    commit();return null;
+  }});
+  $('dlg-save').textContent='Record payment';
+  $('dlg-body').insertAdjacentHTML('afterbegin',payHistoryHTML(u)+'<p class="cap f-full" style="margin:8px 0 0"><b>Record a new payment</b></p>');
+  fillRecorders();
+}
+/* ---------- landlord dialog ---------- */
+function openLandDialog(id){
+  var l=id?DATA.landlord.filter(function(x){return x.id===id;})[0]:null;
+  var v=l||{property:'',landlord:'',amount:'',variable:false,start:'',end:'',link:'',note:'',currency:'NGN',dues:[null,null,null,null],dueVar:[false,false,false,false]};
+  var fields=[
+    {name:'property',label:'Property (as named in the landlord register)',type:'text',value:v.property,full:true},
+    {name:'landlord',label:'Landlord',type:'text',value:v.landlord},
+    {name:'link',label:'Matches tenant property',type:'select',value:v.link,options:[['','Not linked']].concat(DATA.properties.map(function(p){return [p,p];}))},
+    {name:'currency',label:'Currency we pay in',type:'select',value:v.currency||'NGN',options:[['NGN','Naira (\u20A6)'],['USD','US Dollars ($)'],['EUR','Euros (\u20AC)']]},
+    {name:'amount',label:'Rent on register (per year, in that currency)',type:'number',value:v.amount==null?'':v.amount},
+    {name:'variable',label:'Rent is variable',type:'checkbox',value:v.variable},
+    {name:'start',label:'Head lease start',type:'date',value:v.start||''},
+    {name:'end',label:'Head lease end',type:'date',value:v.end||'',hint:'Used for the head lease expiry alerts. Leave empty if there is no fixed end date.'}
+  ];
+  for(var i=0;i<4;i++){
+    fields.push({name:'due'+i,label:'Q'+(i+1)+' rent due (in that currency)',type:'number',value:v.dues[i]==null?'':v.dues[i]});
+    fields.push({name:'var'+i,label:'Q'+(i+1)+' amount unspecified',type:'checkbox',value:v.dueVar[i]});
+  }
+  fields.push({name:'note',label:'Note',type:'textarea',value:v.note,full:true});
+  openDialog(l?'Edit landlord entry':'Add landlord entry',fields,{
+    onSave:function(x){
+      if(!x.property.trim())return 'Enter the property name.';
+      var amt=toNum(x.amount),dues=[],dv=[];
+      if(amt!==null&&amt<0)return 'Rent cannot be negative.';
+      for(var i=0;i<4;i++){var d=toNum(x['due'+i]);if(d!==null&&d<0)return 'Quarterly amounts cannot be negative.';dues.push(d);dv.push(!!x['var'+i]);}
+      var t=l||{id:newId('l')};
+      t.property=x.property.trim();t.landlord=x.landlord.trim();t.link=x.link;t.amount=amt;t.variable=!!x.variable;
+      if(x.start&&x.end&&x.end<x.start)return 'The head lease end date is before the start date.';
+      t.start=x.start||'';t.end=x.end||'';t.currency=x.currency||'NGN';t.dues=dues;t.dueVar=dv;t.note=x.note.trim();
+      if(!l)DATA.landlord.push(t);
+      commit();return null;
+    },
+    onDelete:l?function(){DATA.landlord=DATA.landlord.filter(function(x){return x.id!==l.id;});commit();return null;}:null,
+    deleteLabel:'Delete entry'
+  });
+}
+
+/* ---------- manage properties dialog ---------- */
+function openFxDialog(){
+  var fields=[
+    {name:'usd',label:'1 USD = \u20A6',type:'number',value:DATA.fx.USD},
+    {name:'eur',label:'1 EUR = \u20A6',type:'number',value:DATA.fx.EUR}
+  ];
+  var n=DATA.units.filter(function(u){return u.currency!=='NGN';}).length+DATA.landlord.filter(function(l){return l.currency&&l.currency!=='NGN';}).length;
+  openDialog('Exchange rates',fields,{
+    onSave:function(x){
+      var usd=toNum(x.usd),eur=toNum(x.eur);
+      if(!usd||usd<=0||!eur||eur<=0)return 'Enter a rate greater than zero for both currencies.';
+      DATA.fx={USD:usd,EUR:eur};
+      DATA.units.forEach(function(u){
+        if(u.currency!=='NGN'&&u.fxRent!=null){u.rent=Math.round(u.fxRent*DATA.fx[u.currency]);u.sc=Math.round((u.fxSc||0)*DATA.fx[u.currency]);}
+      });
+      commit();return null;
+    }
+  });
+  $('dlg-body').insertAdjacentHTML('afterbegin','<p class="cap f-full" style="margin:0 0 2px">Used to convert the '+n+' tenant and head lease'+(n===1?'':'s')+' priced in dollars or euros into naira. Rates move daily, so update these when you check.</p>');
+}
+function openPropDialog(){
+  if(!DATA.properties.length)return;
+  var first=state.prop&&DATA.properties.indexOf(state.prop)>=0?state.prop:DATA.properties[0];
+  var last=first;
+  var fields=[
+    {name:'sel',label:'Property',type:'select',value:first,options:DATA.properties.map(function(p){return [p,p];}),full:true},
+    {name:'name',label:'Name',type:'text',value:first},
+    {name:'color',label:'Colour',type:'color',value:pc(first)}
+  ];
+  openDialog('Rename, recolour or remove a property',fields,{
+    onChange:function(){
+      var x=readVals();
+      if(x.sel!==last){last=x.sel;$('f_name').value=x.sel;$('f_color').value=pc(x.sel);}
+    },
+    onSave:function(x){
+      var oldN=x.sel,newN=x.name.trim();
+      if(!newN)return 'Enter a name.';
+      if(newN!==oldN&&DATA.properties.some(function(p){return p.toLowerCase()===newN.toLowerCase()&&p!==oldN;}))return 'Another property already has that name.';
+      if(newN!==oldN){
+        DATA.properties[DATA.properties.indexOf(oldN)]=newN;
+        DATA.propColors[newN]=DATA.propColors[oldN];delete DATA.propColors[oldN];
+        DATA.units.forEach(function(u){if(u.property===oldN)u.property=newN;});
+        DATA.landlord.forEach(function(l){if(l.link===oldN)l.link=newN;});
+        if(state.prop===oldN)state.prop=newN;
+      }
+      DATA.propColors[newN]=x.color;
+      commit();return null;
+    },
+    onDelete:function(){
+      var x=readVals(),p=x.sel;
+      if(DATA.units.some(function(u){return u.property===p;}))return 'This property still has units. Delete or move them first.';
+      DATA.properties=DATA.properties.filter(function(n){return n!==p;});delete DATA.propColors[p];
+      DATA.landlord.forEach(function(l){if(l.link===p)l.link='';});
+      if(state.prop===p)state.prop='';
+      commit();return null;
+    },
+    deleteLabel:'Remove property'
+  });
+}
+
+/* ---------- spreadsheet export ---------- */
+var TYPE_LABEL={occupied:'',vacant:'',vacated:'',not_managed:'NOT MANAGED BY VESTATES'};
+function buildWorkbook(){
+  var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,summarySheet(),'Summary');
+  var rows=[['S/N','TENANT NAME','UNIT / ADDRESS','RENT AS ENTERED (\u20A6)','SERVICE CHARGE AS ENTERED (\u20A6)','ANNUAL DUE, ADJUSTED FOR PREPAYMENT (\u20A6)','LEASE START','LEASE END','PHONE','EMAIL','ORGANISATION / OCCUPATION','TYPE','RENEWAL STATUS','PAYMENT STATUS (THIS TERM)','AMOUNT RECEIVED THIS TERM (\u20A6)','NOTE','SAME COMPANY AS','LEASE TERM (YEARS)','CURRENCY','RENT (FOREIGN)','SERVICE CHARGE (FOREIGN)','OCCUPANCY STATUS','MOVED OUT ON','PAYS','MONTHLY FEE']];
+  DATA.properties.forEach(function(p){
+    rows.push([p,DATA.propColors[p]||null]);
+    var n=0;
+    DATA.units.filter(function(u){return u.property===p;}).forEach(function(u){
+      n++;var occ=u.status==='occupied'||u.status==='vacated';
+      rows.push([n,occ?u.tenant:TYPE_LABEL[u.status]||null,u.unit,occ?u.rent:null,occ?u.sc:null,occ?due(u):null,dtxt(u.start),dtxt(u.end),u.phone||null,u.email||null,u.org||null,occ?u.type:null,u.renewal||null,occ?payStatus(u):null,occ?received(u):null,u.note||null,u.group||null,(occ&&termMonths(u)!==null)?Math.round(termMonths(u)/12*10)/10:null,occ?u.currency:null,occ&&u.currency!=='NGN'?u.fxRent:null,occ&&u.currency!=='NGN'?u.fxSc:null,STLAB[u.status]||null,u.vacatedOn?dtxt(u.vacatedOn):null,occ?(isMonthly(u)?'Monthly':'Upfront'):null,isMonthly(u)?u.monthly:null]);
+    });
+  });
+  var w1=XLSX.utils.aoa_to_sheet(rows);
+  w1['!cols']=[{wch:6},{wch:34},{wch:24},{wch:16},{wch:18},{wch:16},{wch:16},{wch:16},{wch:15},{wch:26},{wch:26},{wch:12},{wch:14},{wch:14},{wch:18},{wch:36},{wch:24},{wch:12},{wch:10},{wch:16},{wch:18}];
+  XLSX.utils.book_append_sheet(wb,w1,'Tenant Register');
+
+  var lr=[['S/N','PROPERTY (LANDLORD REGISTER NAME)','LANDLORD','RENT ON REGISTER (PER YEAR)','TERM START','TERM END','Q1 DUE','Q2 DUE','Q3 DUE','Q4 DUE','TOTAL SCHEDULED (\u20A6)','MATCHES TENANT PROPERTY','NOTE','CURRENCY','HEAD LEASE STATUS']];
+  DATA.landlord.forEach(function(l,i){
+    var qs=l.dues.map(function(d,k){return l.dueVar[k]&&typeof d!=='number'?'VARIABLE':(typeof d==='number'?d:null);});
+    var tot=l.dues.reduce(function(s,x){return s+(typeof x==='number'?toNGN(x,l.currency):0);},0);
+    lr.push([i+1,l.property,l.landlord||null,l.variable?'VARIABLE':(typeof l.amount==='number'?l.amount:null),dtxt(l.start)||null,dtxt(l.end)||null,qs[0],qs[1],qs[2],qs[3],tot,l.link||null,l.note||null,l.currency||'NGN',hlStatus(l).lab]);
+  });
+  var w2=XLSX.utils.aoa_to_sheet(lr);
+  w2['!cols']=[{wch:6},{wch:36},{wch:34},{wch:18},{wch:22},{wch:22},{wch:16},{wch:16},{wch:16},{wch:16},{wch:18},{wch:30},{wch:50},{wch:10},{wch:24}];
+  XLSX.utils.book_append_sheet(wb,w2,'Landlord Register');
+
+  var byId={};DATA.units.forEach(function(u){byId[u.id]=u;});
+  var pr=[['DATE RECEIVED','PROPERTY','UNIT','TENANT','LEASE TERM','CURRENCY','AMOUNT','AMOUNT (\u20A6)','METHOD','REFERENCE','NOTE','CURRENT TERM?']];
+  DATA.payments.slice().sort(function(a,b){return a.date<b.date?-1:1;}).forEach(function(p){
+    var u=byId[p.unitId]||{};var t=(p.term||'|').split('|');
+    pr.push([p.date,u.property||'(deleted unit)',u.unit||null,u.tenant||null,dtxt(t[0])+' \u2013 '+dtxt(t[1]),p.currency||'NGN',p.amount,toNGN(p.amount,p.currency),p.method||null,p.ref||null,p.note||null,u.id&&termKey(u)===p.term?'Yes':'No']);
+  });
+  var w4=XLSX.utils.aoa_to_sheet(pr);
+  w4['!cols']=[{wch:14},{wch:30},{wch:16},{wch:30},{wch:34},{wch:10},{wch:14},{wch:16},{wch:14},{wch:20},{wch:30},{wch:14}];
+  XLSX.utils.book_append_sheet(wb,w4,'Payments');
+  var ph=[['PROPERTY','UNIT','WHAT HAPPENED','TENANT','TYPE','TERM START','TERM END','MOVED OUT / RENEWED ON','RENT FOR TERM (\u20A6)','SERVICE CHARGE FOR TERM (\u20A6)','CURRENCY']];
+  DATA.units.forEach(function(u){(u.history||[]).forEach(function(h){var k=h.kind||(h.vacatedOn?'Moved out':'Renewed');ph.push([u.property,u.unit,k,h.tenant,h.type||null,dtxt(h.start)||null,dtxt(h.end)||null,dtxt(h.vacatedOn||h.renewedOn)||null,h.rent||null,h.sc||null,h.currency||'NGN']);});});
+  var w5=XLSX.utils.aoa_to_sheet(ph);w5['!cols']=[{wch:30},{wch:16},{wch:14},{wch:32},{wch:12},{wch:18},{wch:18},{wch:22},{wch:16},{wch:18},{wch:10}];
+  XLSX.utils.book_append_sheet(wb,w5,'Lease History');
+
+  var F=facts(),T=landlordTotals(),I=incomeByQuarter(F),recv=F.occ.reduce(function(s,r){return s+received(r.u);},0);
+  var cf=[['Quarter','Expected income (\u20A6)','Landlord rent due (\u20A6)','Net (\u20A6)']];
+  for(var i=0;i<4;i++)cf.push(['Q'+(i+1),Math.round(I.q[i]),T.q[i],Math.round(I.q[i]-T.q[i])]);
+  cf.push([]);
+  cf.push(['Rent received, all recorded payments (\u20A6)',Math.round(totalReceived())]);
+  cf.push(['Total landlord rent scheduled (\u20A6)',T.total]);
+  cf.push(['Exchange rate: 1 USD (\u20A6)',DATA.fx.USD]);
+  cf.push(['Exchange rate: 1 EUR (\u20A6)',DATA.fx.EUR]);
+  cf.push(['Exported on',new Date().toISOString().slice(0,10)]);
+  cf.push([]);
+  cf.push(['Expected income by property (quarter rent falls due)','Q1','Q2','Q3','Q4','Total']);
+  DATA.properties.forEach(function(p){var a=I.byProp[p];if(a&&(a[0]||a[1]||a[2]||a[3]))cf.push([p,Math.round(a[0]),Math.round(a[1]),Math.round(a[2]),Math.round(a[3]),Math.round(a[0]+a[1]+a[2]+a[3])]);});
+  cf.push(['Total',Math.round(I.q[0]),Math.round(I.q[1]),Math.round(I.q[2]),Math.round(I.q[3]),Math.round(I.total)]);
+  if(I.noEndN)cf.push(['Occupied leases with no end date (not counted)',I.noEndN,Math.round(I.noEnd)]);
+  var w3=XLSX.utils.aoa_to_sheet(cf);
+  w3['!cols']=[{wch:44},{wch:22},{wch:24},{wch:18},{wch:18},{wch:18}];
+  XLSX.utils.book_append_sheet(wb,w3,'Cash Flow');
+  return wb;
+}
+function stamp(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function saveWorkbook(wb,name,btn){
+  if(!window.XLSX){status([{cls:'err',text:'The spreadsheet library could not load. Check your internet connection and reload the page.'}],true);return;}
+  try{
+    if(DL){
+      var data=XLSX.write(wb,{bookType:'xlsx',type:'array'});
+      DL.save({filename:name,data:data}).then(function(){if(btn){var o=btn.textContent;btn.textContent='Downloaded';setTimeout(function(){btn.textContent=o;},1500);}}).catch(function(err){if(err&&err.code!=='declined')status([{cls:'err',text:'The spreadsheet could not be saved here. Try again in a moment.'}],true);});
+    }else XLSX.writeFile(wb,name);
+  }catch(e){status([{cls:'err',text:'The spreadsheet could not be created here. Try opening the dashboard in a normal browser tab.'}],true);}
+}
+function download(){if(!window.XLSX){saveWorkbook(null);return;}saveWorkbook(buildWorkbook(),'Vestates_Lease_Report_'+stamp()+'.xlsx',$('btn-download'));}
+function xd(iso){if(!iso)return null;var d=new Date(iso+'T00:00:00');return isNaN(d)?null:d;}
+function filterText(){
+  var f=[];
+  if(state.prop)f.push('Property: '+state.prop);
+  if(state.status)f.push('Occupancy: '+STLAB[state.status]);
+  if(state.qtr)f.push('Lease ends in '+qLabel(state.qtr));
+  if(state.tile)f.push('Expiry: '+BLAB[state.tile]);
+  if(state.rstat)f.push('Renewal: '+(state.rstat==='__none'?'Not started':(state.rstat==='__leaving'?'Moving out':state.rstat)));
+  if(state.pay)f.push('Payment: '+(state.pay==='unpaid'?'Unpaid':state.pay));
+  if(state.term)f.push('Lease length: '+({multi:'2 years and above',short:'Under 2 years',nodates:'No start or end date'}[state.term]));
+  if(state.q)f.push('Search: "'+state.q+'"');
+  return f.length?f.join('; '):'None (all leases)';
+}
+function autoCols(aoa,start){
+  var w=[];aoa.slice(start||0).forEach(function(r){r.forEach(function(c,i){var l=c==null?0:(c instanceof Date?12:String(c).length);w[i]=Math.min(50,Math.max(w[i]||8,l+2));});});
+  return w.map(function(x){return {wch:x};});
+}
+function downloadList(){
+  if(!window.XLSX){saveWorkbook(null);return;}
+  var rows=listRows(),show=state.showContact;
+  var head=['Property','Unit','Tenant','Tenant type','Status','Expiry','Lease start','Lease end','Days to end','Term','Rent due date','Due / year (\u20A6)','Currency','Term amount (lease currency)','Renewal','Payment this term','Paid this term (lease currency)','Balance this term (lease currency)','Head lease','Note','Pays','Monthly fee','Paid to'];
+  if(show)head.push('Phone','Email');
+  var aoa=[['Vestates lease report \u2014 filtered list'],['Exported',stamp()],['Filters',filterText()],['Sorted by',state.sort==='property'?'Property':'Soonest expiry first'],['Leases',rows.length],[],head];
+  var tDue=0,tPaid=0;
+  rows.forEach(function(r){
+    var u=r.u,occ=u.status==='occupied',vt=u.status==='vacated',lc=leaseCur(u),tm=termMonths(u),hr=unitHeadRisk(u);
+    var exp=vt?'Vacated'+(u.vacatedOn?' '+dtxt(u.vacatedOn):''):!occ?(u.status==='vacant'?'Vacant':'Not managed'):(r.bucket?BLAB[r.bucket]:(u.renewal==='Renewed'?'Renewed':'Later / no date'));
+    var paid=occ?Math.round(paidCur(u)*100)/100:null,td=occ?termDueCur(u):null;
+    if(occ){tDue+=r.due;tPaid+=received(u);}
+    var hasT=occ||vt;
+    if(vt){paid=Math.round(paidCur(u)*100)/100;td=termDueCur(u);}
+    var line=[u.property,u.unit,hasT?(show||u.type!=='Individual'?u.tenant:maskName(u.tenant)):null,hasT?u.type:null,STLAB[u.status],exp,
+      xd(u.start),xd(u.end),r.days,occ&&tm!==null?termLabel(tm):null,occ&&u.end?xd(nextDueISO(u.end)):null,occ?Math.round(r.due):null,occ?lc:null,td,
+      occ?(u.renewal||'Not started'):null,hasT?payStatus(u):null,paid,hasT?Math.max(0,Math.round((td-paid)*100)/100):null,
+      hr==='ended'?'Head lease ended':(hr==='past'?'Runs past head lease':null),u.note||null,occ?(isMonthly(u)?'Monthly':'Upfront'):null,isMonthly(u)?u.monthly:null,isMonthly(u)?xd(paidThrough(u)):null];
+    if(show)line.push(hasT?u.phone||null:null,hasT?u.email||null:null);
+    aoa.push(line);
+  });
+  aoa.push([]);aoa.push(['Total due / year (\u20A6), occupied leases shown',Math.round(tDue)]);aoa.push(['Received this term (\u20A6), leases shown',Math.round(tPaid)]);
+  if(!show)aoa.push(['Individual tenant names are shortened to initials. Turn on "Show tenant names & contacts" before downloading to include full names and contacts.']);
+  var ws=XLSX.utils.aoa_to_sheet(aoa,{cellDates:true,dateNF:'dd-mmm-yyyy'});ws['!cols']=autoCols(aoa,6);
+  var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Leases');
+  saveWorkbook(wb,'Vestates_Leases_'+(state.prop?state.prop.replace(/[^A-Za-z0-9]+/g,'_')+'_':'')+stamp()+'.xlsx',$('btn-dl-list'));
+}
+function downloadLand(){
+  if(!window.XLSX){saveWorkbook(null);return;}
+  var rows=landRows(),lab={ended:'Head leases ended',d90:'Ending within 90 days',d365:'Ending in 91 days to a year',past:'Tenants past head-lease end'};
+  var head=['Property (landlord register)','Landlord','Linked property','Currency','Rent on register','Head lease start','Head lease end','Status','Occupied units','Q1 due','Q2 due','Q3 due','Q4 due','Scheduled / year (\u20A6)','Note'];
+  var aoa=[['Vestates head lease report'],['Exported',stamp()],['Filter',state.ltile?lab[state.ltile]:'None (all head leases)'],['Entries',rows.length],[],head];
+  rows.forEach(function(l){
+    var occN=l.link?DATA.units.filter(function(u){return u.property===l.link&&u.status==='occupied';}).length:null;
+    var qs=l.dues.map(function(d,k){return typeof d==='number'?d:(l.dueVar[k]?'Unspecified':null);});
+    var sched=l.dues.reduce(function(s,x){return s+(typeof x==='number'?toNGN(x,l.currency):0);},0);
+    aoa.push([l.property,l.landlord||null,l.link||null,l.currency||'NGN',l.variable?'Variable':(typeof l.amount==='number'?l.amount:null),xd(l.start),xd(l.end),hlStatus(l).lab,occN,qs[0],qs[1],qs[2],qs[3],sched,l.note||null]);
+  });
+  var ws=XLSX.utils.aoa_to_sheet(aoa,{cellDates:true,dateNF:'dd-mmm-yyyy'});ws['!cols']=autoCols(aoa,5);
+  var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Head leases');
+  saveWorkbook(wb,'Vestates_Head_Leases_'+stamp()+'.xlsx',$('btn-dl-land'));
+}
+function summarySheet(){
+  var F=facts(),rate=F.managed.length?F.occ.length/F.managed.length:0,avg=F.occ.length?F.rentTot/F.occ.length:0;
+  var b={exp:[0,0],d30:[0,0],d60:[0,0],d90:[0,0],d180:[0,0]};
+  F.all.forEach(function(r){if(r.bucket){b[r.bucket][0]++;b[r.bucket][1]+=r.due;}});
+  var paid=0,partial=0,unpaid=0,recv=0,out=0;
+  var arrT=0;F.occ.forEach(function(r){var st=payStatus(r.u);if(st==='Paid')paid++;else if(st==='Partial')partial++;else if(st==='Unpaid')unpaid++;out+=owedNGN(r.u);arrT+=arrears(r.u);});recv=totalReceived();
+  var hl={ended:0,d90:0,d365:0},endedUnits=0,past=0;
+  DATA.landlord.forEach(function(l){var k=hlStatus(l).k;if(hl.hasOwnProperty(k))hl[k]++;});
+  F.occ.forEach(function(r){var k=unitHeadRisk(r.u);if(k==='ended')endedUnits++;else if(k==='past')past++;});
+  var T=landlordTotals(),I=incomeByQuarter(F);
+  var aoa=[['Vestates lease report \u2014 summary'],['As of',stamp()],[],
+    ['Portfolio'],['Properties',DATA.properties.length],['Units',DATA.units.length],['Occupied units',F.occ.length],['Empty units (vacant + vacated)',F.vac.length],['  of which tenant moved out',F.vtd.length],['Occupancy (managed units)',Math.round(rate*1000)/10+'%'],
+    ['Contracted rent / year (\u20A6)',Math.round(F.rentTot)],['Est. rent lost / month to vacancy (\u20A6)',Math.round(F.vac.length*avg/12)],[],
+    ['Lease expiry','Leases','Due / year (\u20A6)']];
+  ['exp','d30','d60','d90','d180'].forEach(function(k){aoa.push([BLAB[k],b[k][0],Math.round(b[k][1])]);});
+  aoa.push([],['Payments (current lease terms)'],['Paid',paid],['Partial',partial],['Unpaid',unpaid],['Rent received, all recorded payments (\u20A6)',Math.round(recv)],['Outstanding, terms already started (\u20A6)',Math.round(out)],['  of which carried over from earlier terms (\u20A6)',Math.round(arrT)]);
+  aoa.push([],['Head leases'],['Ended',hl.ended],['Ending within 90 days',hl.d90],['Ending in 91 days to a year',hl.d365],['Occupied units on an ended head lease',endedUnits],['Tenant leases running past the head lease',past]);
+  aoa.push([],['Cash flow, typical year','Expected income (\u20A6)','Landlord rent (\u20A6)','Net (\u20A6)']);
+  for(var i=0;i<4;i++)aoa.push(['Q'+(i+1),Math.round(I.q[i]),T.q[i],Math.round(I.q[i]-T.q[i])]);
+  var ws=XLSX.utils.aoa_to_sheet(aoa);ws['!cols']=[{wch:44},{wch:22},{wch:22},{wch:18}];
+  return ws;
+}
+/* ---------- spreadsheet import ---------- */
+function clean(s){return String(s==null?'':s).replace(/\s+/g,' ').trim();}
+function pdate(v){
+  if(typeof v==='number'&&v>20000&&v<80000){var d=new Date(Date.UTC(1899,11,30)+v*86400000);return isNaN(d)?null:d.toISOString().slice(0,10);}
+  if(typeof v!=='string')return null;
+  var s=v.trim();
+  if(/^\d{4}-\d{2}-\d{2}/.test(s))return s.slice(0,10);
+  var m=s.match(/^(\d+)\s*(?:st|nd|rd|th)?\s+(?:of\s+)?([A-Za-z]+)\s+(\d{4})/);
+  if(!m)return null;
+  var mo=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'].indexOf(m[2].slice(0,3).toLowerCase());
+  if(mo<0)return null;
+  var d2=new Date(Date.UTC(+m[3],mo,+m[1]));return isNaN(d2)?null:d2.toISOString().slice(0,10);
+}
+function numv(v){if(typeof v==='number')return v;if(typeof v==='string'){var n=parseFloat(v.replace(/[^0-9.\-]/g,''));return isFinite(n)?n:null;}return null;}
+function parseTenants(rowsArr){
+  var props=[],units=[],cur=null,colors={};
+  for(var i=1;i<rowsArr.length;i++){
+    var r=rowsArr[i]||[],a=r[0];
+    if(typeof a==='number'){
+      if(cur===null)continue;
+      var name=clean(r[1]),full_=clean(r[2]),unit=full_?clean(full_.split(',')[0]):'';
+      var status,tenant=null;
+      if(name&&/NOT MANAGED/i.test(name))status='not_managed';
+      else if(name){status=/^vacated$/i.test(clean(r[21]))?'vacated':'occupied';tenant=name;}else status='vacant';
+      var ph=r[8];ph=(typeof ph==='number')?String(Math.round(ph)):(clean(ph)||null);
+      var ren=clean(r[12]);
+      units.push({id:newId('u'),property:cur,unit:unit,tenant:tenant,status:status,rent:numv(r[3])||0,sc:numv(r[4])||0,
+        start:pdate(r[6]),end:pdate(r[7]),org:clean(r[10])||null,type:['Individual','Company','Embassy','Other'].indexOf(clean(r[11]))>=0?clean(r[11]):'Individual',
+        phone:ph,email:clean(r[9])||null,renewal:['In talks','Renewed','Leaving','Notice given'].indexOf(ren)>=0?ren:'',
+        group:clean(r[16]),note:clean(r[15]),
+        currency:['USD','EUR'].indexOf(clean(r[18]))>=0?clean(r[18]):'NGN',fxRent:numv(r[19]),fxSc:numv(r[20]),vacatedOn:status==='vacated'?pdate(r[22]):null,billing:/^monthly$/i.test(clean(r[23]))?'monthly':'upfront',monthly:numv(r[24])});
+      var mk=(cur+'|'+unit).toLowerCase(),ex=DATA.units.filter(function(x){return (x.property+'|'+x.unit).toLowerCase()===mk;})[0];
+      if(ex&&!units.some(function(x){return x.id===ex.id;}))units[units.length-1].id=ex.id;
+    }else if(typeof a==='string'&&a.trim()){
+      var h=clean(a);cur=h.length>34?h.split(',')[0].trim():h;
+      if(props.indexOf(cur)<0)props.push(cur);
+      if(/^#[0-9a-f]{6}$/i.test(clean(r[1])))colors[cur]=clean(r[1]).toLowerCase();
+    }
+  }
+  return {properties:props,units:units,colors:colors};
+}
+function parseLandlords(rowsArr){
+  var out=[];
+  for(var i=1;i<rowsArr.length;i++){
+    var r=rowsArr[i]||[];
+    if(typeof r[0]!=='number'||!clean(r[1]))continue;
+    var dues=[],dv=[];
+    for(var k=0;k<4;k++){var c=r[6+k];if(typeof c==='string'&&/variable/i.test(c)){dues.push(null);dv.push(true);}else{dues.push(numv(c));dv.push(false);}}
+    var amt=r[3],variable=typeof amt==='string'&&/variable/i.test(amt);
+    var ex=DATA.landlord.filter(function(x){return x.property.toLowerCase()===clean(r[1]).toLowerCase();})[0];
+    out.push({id:ex&&!out.some(function(o){return o.id===ex.id;})?ex.id:newId('l'),property:clean(r[1]),landlord:clean(r[2]),amount:variable?null:numv(amt),variable:variable,start:pdate(r[4])||'',end:pdate(r[5])||'',dues:dues,dueVar:dv,link:clean(r[11]),note:clean(r[12]),currency:['USD','EUR'].indexOf(clean(r[13]))>=0?clean(r[13]):'NGN'});
+  }
+  return out;
+}
+function status(items,open){
+  $('status').innerHTML=items.map(function(i){return '<li class="'+i.cls+'">'+esc(i.text)+'</li>';}).join('');
+  if(open)$('data-panel').open=true;
+}
+function handleFile(file){
+  if(!file)return;
+  if(!CAN_WRITE||!allLoaded()){status([{cls:'err',text:'You can only load a spreadsheet once the shared data has loaded and you have edit access.'}],true);return;}
+  if(!window.XLSX){status([{cls:'err',text:'The spreadsheet library could not load. Check your internet connection and reload the page.'}],true);return;}
+  var rd=new FileReader();
+  rd.onload=function(){
+    try{
+      var wb=XLSX.read(rd.result,{type:'array'});
+      var tsn=wb.SheetNames.filter(function(n){return /tenant/i.test(n);})[0]||wb.SheetNames[0];
+      var t=parseTenants(XLSX.utils.sheet_to_json(wb.Sheets[tsn],{header:1,defval:null,raw:true}));
+      if(!t.units.length){status([{cls:'err',text:'No unit rows were found in this file, so nothing was changed.'}],true);return;}
+      var msgs=[];
+      DATA.units=t.units;
+      var props=t.properties.slice();
+      t.units.forEach(function(u){if(props.indexOf(u.property)<0)props.push(u.property);});
+      var old=DATA.propColors;DATA.properties=props;DATA.propColors={};
+      props.forEach(function(p){DATA.propColors[p]=t.colors[p]||old[p]||nextColor(DATA);});
+      msgs.push({cls:'ok',text:props.length+' properties and '+t.units.length+' units loaded.'});
+      var lsn=wb.SheetNames.filter(function(n){return /landlord/i.test(n);})[0];
+      if(lsn){
+        var ll=parseLandlords(XLSX.utils.sheet_to_json(wb.Sheets[lsn],{header:1,defval:null,raw:true}));
+        if(ll.length){DATA.landlord=ll;msgs.push({cls:'ok',text:ll.length+' landlord entries loaded.'});}
+      }else msgs.push({cls:'warn',text:'No landlord sheet in this file, so the landlord list was left as it is.'});
+      normalize(DATA);state.tile='';state.prop='';
+      commit();status(msgs,true);
+    }catch(e){status([{cls:'err',text:'Could not read this file. Nothing was changed.'}],true);}
+  };
+  rd.readAsArrayBuffer(file);
+}
+
+/* ---------- wiring ---------- */
+function init(){
+  DATA=emptyData();
+  initDialog();
+  document.querySelectorAll('.tab').forEach(function(b){b.addEventListener('click',function(){setTab(b.getAttribute('data-tab'));});});
+  $('btn-download').addEventListener('click',download);
+  $('btn-add-unit').addEventListener('click',function(){openUnitDialog(null);});
+  $('btn-add-land').addEventListener('click',function(){openLandDialog(null);});
+  $('btn-manage-props').addEventListener('click',openPropDialog);
+  $('btn-fx').addEventListener('click',openFxDialog);
+  $('btn-copy').addEventListener('click',followUp);
+  $('btn-dl-list').addEventListener('click',downloadList);
+  $('btn-dl-land').addEventListener('click',downloadLand);
+  $('btn-contacts').addEventListener('click',function(){state.showContact=!state.showContact;this.setAttribute('aria-pressed',state.showContact);renderAll();});
+  $('f-prop').addEventListener('change',function(e){state.prop=e.target.value;renderAll();});
+  $('f-rstat').addEventListener('change',function(e){state.rstat=e.target.value;renderList();});
+  $('f-pay').addEventListener('change',function(e){state.pay=e.target.value;renderList();});
+  $('f-status').addEventListener('change',function(e){state.status=e.target.value;renderList();});
+  $('f-qtr').addEventListener('change',function(e){state.qtr=e.target.value;renderList();});
+  $('rlegend').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;var v=b.getAttribute('data-rs');state.rstat=state.rstat===v?'':v;$('f-rstat').value=state.rstat;renderList();});
+  $('f-term').addEventListener('change',function(e){state.term=e.target.value;renderList();});
+  $('f-sort').addEventListener('change',function(e){state.sort=e.target.value;renderList();});
+  $('f-search').addEventListener('input',function(e){state.q=e.target.value.toLowerCase();renderList();});
+  $('ltiles').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;var k=b.getAttribute('data-lt');state.ltile=state.ltile===k?'':k;landlordTable();ltiles();});
+  $('hl-alert').addEventListener('click',function(e){var b=e.target.closest('[data-go]');if(!b)return;setTab('landlords');state.ltile='ended';landlordTable();ltiles();});
+  document.addEventListener('focusout',function(){if(renderPending){setTimeout(function(){if(renderPending){renderPending=false;scheduleRender();}},0);}});
+  ['qgrid','inc-table'].forEach(function(id){
+    $(id).addEventListener('click',function(e){
+      var el=e.target.closest('[data-act="qview"]');if(!el)return;
+      var i=+el.getAttribute('data-q'),prop=el.getAttribute('data-prop')||null;
+      var names=['Q1','Q2','Q3','Q4'];
+      openViewDialog((prop?esc(prop)+' \u2014 ':'')+names[i]+' expected income',quarterTenantsHTML(i,prop));
+    });
+  });
+  $('tiles').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;var k=b.getAttribute('data-b');state.tile=state.tile===k?'':k;renderAll();});
+  $('pcards').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;var p=b.getAttribute('data-p');state.prop=state.prop===p?'':p;renderAll();});
+  $('land').addEventListener('click',function(e){var b=e.target.closest('button[data-act="edit-land"]');if(b)openLandDialog(b.getAttribute('data-id'));});
+  var list=$('list');
+  list.addEventListener('click',function(e){
+    var b=e.target.closest('button');if(!b)return;
+    var act=b.getAttribute('data-act');
+    if(act==='edit')openUnitDialog(b.getAttribute('data-id'));
+    else if(act==='pay')openPayDialog(b.getAttribute('data-id'));
+    else if(act==='relet')openUnitDialog(b.getAttribute('data-id'),'relet');
+    else if(act==='copy')copyText(b.getAttribute('data-ph'),function(){var o=b.textContent;b.textContent='Copied';setTimeout(function(){b.textContent=o;},1000);});
+    else if(act==='remind'){
+      var u=DATA.units.filter(function(x){return x.id===b.getAttribute('data-id');})[0];
+      if(u){sendReminder(u);var o=b.textContent;b.textContent='Opening email\u2026';setTimeout(function(){b.textContent=o;},1200);}
+    }
+  });
+  list.addEventListener('change',function(e){
+    var el=e.target,act=el.getAttribute('data-act'),id=el.getAttribute('data-id');
+    if(!act||!id)return;
+    var u=DATA.units.filter(function(x){return x.id===id;})[0];if(!u)return;
+    if(act==='renewal'){if(el.value==='__vacate'){el.value=u.renewal;openVacateDialog(u.id);return;}if(el.value==='Renewed'){el.value=u.renewal;if(CAN_WRITE)openRenewDialog(u.id);return;}u.renewal=el.value;commit();}
+    else if(act==='note'){u.note=el.value;sync();}
+  });
+  var drop=$('drop');
+  $('file').addEventListener('change',function(e){handleFile(e.target.files[0]);e.target.value='';});
+  ['dragenter','dragover'].forEach(function(ev){drop.addEventListener(ev,function(e){e.preventDefault();drop.classList.add('over');});});
+  ['dragleave','drop'].forEach(function(ev){drop.addEventListener(ev,function(e){e.preventDefault();drop.classList.remove('over');});});
+  drop.addEventListener('drop',function(e){handleFile(e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0]);});
+  $('btn-backup').addEventListener('click',downloadBackup);
+  $('file-json').addEventListener('change',function(e){restoreBackup(e.target.files[0]);e.target.value='';});
+  initTeam();
+  setTab('tenants');
+  setNote();
+  connect();
+}
+init();
+})();
+</script>
+</body>
+</html>
