@@ -1,0 +1,1016 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Vestates Tenant Registry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: Vault template — floating top bar + slim icon rail, re-flowing card grid; cool-grey ground, Vestates blue accent with green for healthy states */
+:root{
+  --bg:#F3F6FD; --surface:#FFFFFF; --surface-2:#EEF3FC; --line:#E1E8F4;
+  --ink:#0B1530; --ink-2:#47557A; --ink-3:#8793AE;
+  --accent:#2F6BFF; --accent-2:#1EC2F0; --accent-soft:#E5EDFF;
+  --green:#12B76A; --good:#0B9B59; --good-soft:#DCF7EA; --bad:#F0446A; --bad-soft:#FEE7ED; --warn:#E08600; --warn-soft:#FFF1D6; --amber:#FFAE1A; --violet:#8B5CF6;
+  --pill:#0B1530; --on-pill:#FFFFFF; --shadow:0 1px 2px rgba(20,40,90,.05),0 10px 30px -14px rgba(30,60,140,.18);
+  --grad:linear-gradient(120deg,#2F6BFF 0%,#1EC2F0 55%,#12B76A 100%);
+  --f-sans:"Manrope",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-display:"Bricolage Grotesque","Manrope",ui-sans-serif,system-ui,sans-serif;
+  --f-mono:"DM Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --r-lg:22px; --r-md:16px; --r-sm:12px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#070B18; --surface:#101729; --surface-2:#172038; --line:#233050;
+  --ink:#F2F5FF; --ink-2:#A9B4D0; --ink-3:#6D7A9C;
+  --accent:#5C8DFF; --accent-2:#3AD6FA; --accent-soft:#16244A;
+  --green:#2EE59D; --good:#2EE59D; --good-soft:#0F2E24; --bad:#FF6B8B; --bad-soft:#3A1622; --warn:#FFC24D; --warn-soft:#33270E; --amber:#FFC24D; --violet:#A78BFA;
+  --pill:#F2F5FF; --on-pill:#0B1530; --shadow:0 1px 2px rgba(0,0,0,.3),0 12px 34px -14px rgba(0,0,0,.7);
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#070B18; --surface:#101729; --surface-2:#172038; --line:#233050;
+  --ink:#F2F5FF; --ink-2:#A9B4D0; --ink-3:#6D7A9C;
+  --accent:#5C8DFF; --accent-2:#3AD6FA; --accent-soft:#16244A;
+  --green:#2EE59D; --good:#2EE59D; --good-soft:#0F2E24; --bad:#FF6B8B; --bad-soft:#3A1622; --warn:#FFC24D; --warn-soft:#33270E; --amber:#FFC24D; --violet:#A78BFA;
+  --pill:#F2F5FF; --on-pill:#0B1530; --shadow:0 1px 2px rgba(0,0,0,.3),0 12px 34px -14px rgba(0,0,0,.7);
+  color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:radial-gradient(1100px 620px at 8% -12%,color-mix(in srgb,var(--accent) 16%,transparent),transparent 62%),radial-gradient(900px 520px at 100% -4%,color-mix(in srgb,var(--accent-2) 18%,transparent),transparent 60%),radial-gradient(900px 700px at 60% 115%,color-mix(in srgb,var(--green) 12%,transparent),transparent 60%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:var(--f-sans);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;transition:background-color .3s,color .3s}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:45;background:var(--bg)}
+#prog{position:fixed;left:0;right:0;top:env(safe-area-inset-top,0px);height:3px;transform-origin:left;transform:scaleX(0);background:var(--grad);z-index:90;pointer-events:none}
+.head h1,.big,.mid,.ring-c b,.rw b,.hero-copy h2,.hero-kpis b,.drawer h3,.brand .bname,.card-t,.facc h4,.tcard h4{font-family:var(--f-display)}
+.head h1{background:linear-gradient(100deg,var(--ink) 35%,var(--accent) 78%,var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent;padding-bottom:.06em}
+.card-t{font-size:14px;letter-spacing:-.01em}
+/* scroll reveal */
+.sr{opacity:0;transform:translateY(30px) scale(.985);filter:blur(8px);transition:opacity .85s cubic-bezier(.2,.8,.2,1),transform .85s cubic-bezier(.2,.8,.2,1),filter .85s;transition-delay:var(--d,0ms)}
+tr.sr{transform:translateX(-18px);filter:none}
+.sr.in{opacity:1;transform:none;filter:none}
+.sr.in.tilt{transition:opacity .85s,filter .85s,transform .18s ease-out;transition-delay:var(--d,0ms),var(--d,0ms),0ms}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;border-radius:999px;transition:background .3s,box-shadow .3s,padding .3s,margin .3s}
+.top.scrolled{background:color-mix(in srgb,var(--surface) 70%,transparent);backdrop-filter:blur(16px) saturate(1.4);-webkit-backdrop-filter:blur(16px) saturate(1.4);box-shadow:var(--shadow);padding:6px;margin-inline:-6px}
+.top.scrolled .brand,.top.scrolled .tabs,.top.scrolled .icons,.top.scrolled .user{box-shadow:none}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+.mono{font-family:var(--f-mono)}
+svg.lucide{width:16px;height:16px;stroke-width:1.9}
+.app{max-width:1440px;margin:0 auto;padding-block:18px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* top bar */
+.top{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center}
+.brand{display:flex;align-items:center;gap:10px;background:var(--surface);padding:6px 16px 6px 6px;border-radius:999px;box-shadow:var(--shadow);font-weight:600;letter-spacing:-.01em}
+.brand-mark{width:30px;height:30px;border-radius:50%;background:linear-gradient(140deg,var(--accent-2),var(--accent));display:grid;place-items:center;color:#fff;position:relative;overflow:hidden}
+.brand-mark::after{content:"";position:absolute;left:-4px;right:-4px;bottom:-9px;height:14px;border-radius:50%;background:var(--green);opacity:.95}
+.brand-mark svg{position:relative;z-index:1;width:15px;height:15px;margin-top:-4px}
+.brand small{display:block;font-size:10.5px;font-weight:500;color:var(--ink-3);line-height:1}
+.tabs-wrap{justify-self:center;max-width:100%;min-width:0;overflow-x:auto;scrollbar-width:none}
+.tabs-wrap::-webkit-scrollbar{display:none}
+.tabs{position:relative;display:flex;gap:2px;background:var(--surface);padding:5px;border-radius:999px;box-shadow:var(--shadow);width:max-content}
+.tab{position:relative;z-index:1;padding:7px 15px;border-radius:999px;color:var(--ink-2);font-weight:500;font-size:13px;transition:color .25s;white-space:nowrap}
+.tab:hover{color:var(--ink)}
+.tab[aria-current="page"]{color:#fff}
+.tab-ind{position:absolute;top:5px;bottom:5px;left:0;border-radius:999px;background:var(--grad);box-shadow:0 6px 16px -6px color-mix(in srgb,var(--accent) 70%,transparent);transition:transform .45s cubic-bezier(.3,1.3,.5,1),width .45s cubic-bezier(.3,1.3,.5,1)}
+.actions{display:flex;align-items:center;gap:10px}
+.icons{display:flex;gap:2px;background:var(--surface);padding:5px;border-radius:999px;box-shadow:var(--shadow);position:relative}
+.ibtn{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;color:var(--ink-2);position:relative;transition:background .2s,color .2s}
+.ibtn:hover{background:var(--surface-2);color:var(--ink)}
+.dot{position:absolute;top:7px;right:8px;width:6px;height:6px;border-radius:50%;background:var(--bad);box-shadow:0 0 0 2px var(--surface)}
+.user{display:flex;align-items:center;gap:9px;background:var(--surface);padding:5px 12px 5px 5px;border-radius:999px;box-shadow:var(--shadow)}
+.avatar{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:600;font-size:11.5px;color:#fff;flex:none;letter-spacing:.02em}
+.user b{display:block;font-size:12.5px;font-weight:600;line-height:1.1}
+.user small{display:flex;gap:5px;align-items:center;font-size:10.5px;color:var(--ink-3)}
+.sync::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ink-3);margin-right:5px;vertical-align:1px}
+.sync.ok::before{background:var(--good)}.sync.busy::before{background:var(--amber)}.sync.err::before{background:var(--bad)}
+
+/* rail */
+.body{display:grid;grid-template-columns:44px minmax(0,1fr);gap:22px;margin-top:22px}
+.rail{display:flex;flex-direction:column;gap:14px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);align-self:start}
+.rail-group{display:flex;flex-direction:column;gap:4px;background:var(--surface);border-radius:999px;padding:5px;box-shadow:var(--shadow)}
+.rbtn{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:var(--ink-3);transition:background .25s,color .25s}
+.rbtn:hover{color:var(--ink);background:var(--surface-2)}
+.rbtn.on{background:var(--grad);color:#fff}
+
+/* head + buttons */
+.head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+.head h1{font-size:clamp(32px,4.2vw,48px);font-weight:700;letter-spacing:-.035em;margin:0;line-height:1.1;text-wrap:balance}
+.head p{margin:6px 0 0;color:var(--ink-2);font-size:13.5px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:9px 16px;border-radius:999px;font-weight:500;font-size:13px;transition:transform .15s,background .2s,opacity .2s;white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.btn-dark{background:var(--grad);color:#fff;box-shadow:0 8px 20px -8px color-mix(in srgb,var(--accent) 70%,transparent)}
+.btn-dark:hover{opacity:.88}
+.btn-ghost{background:var(--surface-2);color:var(--ink)}
+.btn-ghost:hover{background:var(--line)}
+.btn-danger{background:var(--bad-soft);color:var(--bad)}
+.btn-sm{padding:6px 12px;font-size:12px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+/* cards */
+.card{background:var(--surface);border-radius:var(--r-lg);padding:18px;box-shadow:var(--shadow);min-width:0;transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s}
+.lift:hover{transform:translateY(-4px);box-shadow:var(--shadow),0 18px 32px -18px rgba(17,24,39,.25)}
+.card-h{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.card-t{font-size:13px;font-weight:600}
+.card-s{font-size:11.5px;color:var(--ink-3);margin-top:2px}
+.big{font-size:clamp(26px,2.6vw,32px);font-weight:600;letter-spacing:-.03em;line-height:1.15}
+.mid{font-size:21px;font-weight:600;letter-spacing:-.025em}
+.muted{color:var(--ink-3);font-size:11.5px}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:3px 9px;border-radius:999px;background:var(--surface-2);color:var(--ink-2);white-space:nowrap}
+.chip.good{background:var(--good-soft);color:var(--good)}
+.chip.warn{background:var(--warn-soft);color:var(--warn)}
+.chip.bad{background:var(--bad-soft);color:var(--bad)}
+.chip.blue{background:var(--accent-soft);color:var(--accent)}
+.ic{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:var(--surface-2);color:var(--ink-2);flex:none}
+
+/* motion */
+.rv{animation:rise .7s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0) * 60ms)}
+.still .rv{animation:none}
+@keyframes rise{from{opacity:0;transform:translateY(16px);filter:blur(10px)}to{opacity:1;transform:none;filter:none}}
+.bar-g{transform-origin:left}
+.sr:not(.in) .bar-g,.hbar.sr:not(.in) i{transform:scaleX(0)}
+.sr.in .bar-g{animation:growx 1s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(150ms + var(--j,0) * 40ms)}
+@keyframes growx{from{transform:scaleX(0)}}
+@media (prefers-reduced-motion: reduce){.sr{opacity:1!important;transform:none!important;filter:none!important;transition:none!important}.hero::before{animation:none}.rv,.bar-g{animation:none}.tab-ind,.ring-fg,.fill{transition:none!important}}
+
+/* overview */
+.g-over{display:grid;gap:16px;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr) minmax(0,1.15fr)}
+.g-over .wide{grid-column:span 2}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.stat{background:var(--surface);border-radius:var(--r-md);padding:14px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;min-width:0;text-align:left;color:inherit}
+.stats>.stat:nth-child(2){background:linear-gradient(160deg,var(--surface) 40%,color-mix(in srgb,var(--green) 12%,var(--surface)))}
+.stats>.stat:nth-child(3){background:linear-gradient(160deg,var(--surface) 40%,color-mix(in srgb,var(--violet) 12%,var(--surface)))}
+.stats>.stat:nth-child(4){background:linear-gradient(160deg,var(--surface) 40%,color-mix(in srgb,var(--amber) 16%,var(--surface)))}
+.stats>.stat:nth-child(2) .ic{background:var(--good-soft);color:var(--good)}
+.stats>.stat:nth-child(3) .ic{background:color-mix(in srgb,var(--violet) 16%,transparent);color:var(--violet)}
+.stats>.stat:nth-child(4) .ic{background:var(--warn-soft);color:var(--warn)}
+.stat-top{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;color:var(--ink-3)}
+.stat .ic{width:24px;height:24px;border-radius:8px}
+.stat.hot{background:linear-gradient(140deg,#2F6BFF,#1EC2F0 70%,#12B76A 130%);color:#fff;position:relative;overflow:hidden}
+.stat.hot .stat-top,.stat.hot .muted{color:rgba(255,255,255,.85)}
+.stat.hot .ic{background:rgba(255,255,255,.2);color:#fff}
+.stat.hot::before{content:"";position:absolute;right:-34px;bottom:-46px;width:140px;height:80px;border-radius:50%;background:var(--green);opacity:.55}
+.occ-wrap{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.ring{width:118px;height:118px;position:relative;flex:none}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring-bg{stroke:var(--surface-2)} .ring-fg{stroke:var(--accent);transition:stroke-dashoffset 1.2s cubic-bezier(.2,.8,.2,1)}
+.ring-c{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.ring-c b{font-size:22px;font-weight:600;letter-spacing:-.02em;line-height:1}
+.ring-c small{font-size:10px;color:var(--ink-3)}
+.mix{display:flex;flex-direction:column;gap:8px;flex:1;min-width:150px}
+.mix-row{display:grid;grid-template-columns:10px minmax(0,1fr) auto;gap:8px;align-items:center;font-size:12.5px}
+.mix-row i{width:10px;height:10px;border-radius:3px}
+.split{display:flex;height:8px;border-radius:999px;overflow:hidden;gap:2px;margin-top:14px}
+.split span{display:block;height:100%}
+.runway{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.rw{background:var(--surface-2);border-radius:var(--r-md);padding:12px;text-align:left;position:relative;overflow:hidden;transition:background .2s,transform .2s}
+.rw:hover{transform:translateY(-2px);background:var(--line)}
+.rw::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--c)}
+.rw b{display:block;font-size:24px;font-weight:600;letter-spacing:-.02em;color:var(--c)}
+.rw span{font-size:11.5px;color:var(--ink-2)}
+.rw small{display:block;font-size:10.5px;color:var(--ink-3);margin-top:2px}
+.hbar{display:grid;grid-template-columns:minmax(90px,150px) minmax(0,1fr) auto;gap:10px;align-items:center;padding:5px 0;font-size:12px;cursor:pointer;border-radius:8px}
+.hbar:hover .nm{color:var(--accent)}
+.hbar .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink-2)}
+.hbar .track{height:10px;border-radius:999px;background:var(--surface-2);overflow:hidden}
+.hbar .track i{display:block;height:100%;border-radius:inherit;background:var(--grad)}
+.hbar .v{font-weight:600;font-size:12px;min-width:64px;text-align:right}
+
+/* tables */
+.tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.search{display:flex;align-items:center;gap:6px;background:var(--surface-2);border-radius:999px;padding:6px 12px;color:var(--ink-3)}
+.search input{border:0;background:transparent;outline:none;width:170px;font-size:12.5px;color:var(--ink)}
+.search:focus-within{box-shadow:0 0 0 2px var(--accent)}
+.sel{background:var(--surface-2);border:0;border-radius:999px;padding:7px 12px;font-size:12.5px;color:var(--ink);max-width:220px}
+.table-wrap{overflow-x:auto;margin:0 -4px}
+table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:760px}
+th{text-align:left;font-weight:500;color:var(--ink-3);font-size:11.5px;padding:8px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
+th.r,td.r{text-align:right}
+td{padding:10px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+tbody tr{transition:background .15s;cursor:pointer}
+tbody tr:hover{background:var(--surface-2)}
+.who{display:flex;align-items:center;gap:10px;min-width:220px}
+.who b{display:block;font-weight:600;font-size:12.5px;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.who small{display:block;color:var(--ink-3);font-size:11px;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.who .avatar{width:32px;height:32px;font-size:11px}
+.fac{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.fac i{width:8px;height:8px;border-radius:50%;flex:none}
+.empty{padding:28px;text-align:center;color:var(--ink-3)}
+.seg{display:inline-flex;background:var(--surface-2);border-radius:999px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{padding:5px 11px;border-radius:999px;font-size:12px;color:var(--ink-2);display:inline-flex;gap:6px;align-items:center;transition:background .2s,color .2s}
+.seg button.on{background:var(--grad);color:#fff}
+.seg button small{font-size:10px;opacity:.7}
+.count-line{display:flex;justify-content:space-between;align-items:center;margin:10px 2px 0;font-size:12px;color:var(--ink-3)}
+
+/* tenant cards */
+.tcards{display:grid;gap:14px;grid-template-columns:repeat(4,minmax(0,1fr))}
+.tcard{display:flex;flex-direction:column;gap:6px;cursor:pointer;text-align:left;position:relative}
+.tcard .avatar{width:44px;height:44px;font-size:13px;margin-bottom:4px}
+.tcard h4{margin:0;font-size:13.5px;font-weight:600;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.tcard .st{position:absolute;top:16px;right:16px}
+.tcard .kv{display:flex;justify-content:space-between;gap:8px;font-size:11.5px;color:var(--ink-2);border-top:1px solid var(--line);padding-top:8px;margin-top:4px}
+.copy{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;color:var(--accent);padding:2px 0}
+.copy svg.lucide{width:12px;height:12px}
+
+/* facilities */
+.facs{display:grid;gap:14px;grid-template-columns:repeat(4,minmax(0,1fr))}
+.facc{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;cursor:pointer}
+.facc .ftop{display:flex;justify-content:space-between;width:100%;align-items:center}
+.facc .ring{width:100px;height:100px;margin:4px 0}
+.facc h4{margin:0;font-size:13.5px;font-weight:600}
+.facc .meta{display:flex;justify-content:space-between;width:100%;font-size:11.5px;color:var(--ink-2);border-top:1px solid var(--line);padding-top:10px;margin-top:6px}
+.facc .meta b{display:block;color:var(--ink);font-size:13px}
+
+/* renewals */
+.g-two{display:grid;gap:16px;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.rsel{background:var(--surface-2);border:1px solid transparent;border-radius:999px;padding:5px 10px;font-size:12px}
+.rsel.talks{border-color:var(--warn);color:var(--warn)}
+.rsel.renewed{border-color:var(--good);color:var(--good)}
+.rsel.leaving{border-color:var(--bad);color:var(--bad)}
+.days{font-weight:600;font-size:12px}
+
+/* modal */
+.scrim{position:fixed;inset:0;background:rgba(8,10,14,.45);backdrop-filter:blur(4px);display:flex;justify-content:flex-end;z-index:60;animation:fade .25s}
+@keyframes fade{from{opacity:0}}
+.drawer{background:var(--surface);width:min(560px,100%);height:100%;overflow-y:auto;padding:22px max(22px,env(safe-area-inset-right,0px)) calc(22px + env(safe-area-inset-bottom,0px)) 22px;padding-top:calc(22px + env(safe-area-inset-top,0px));animation:slide .4s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;gap:14px}
+@keyframes slide{from{transform:translateX(40px);opacity:0}}
+.drawer h3{margin:0;font-size:20px;letter-spacing:-.02em}
+.dhead{display:flex;gap:12px;align-items:center}
+.dhead .avatar{width:48px;height:48px;font-size:14px}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--ink-2);min-width:0}
+.field.full{grid-column:1/-1}
+.field input,.field select,.field textarea{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:13.5px;outline:none;color:var(--ink);width:100%}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}
+.field small{color:var(--ink-3);font-size:11px}
+.sect{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);grid-column:1/-1;margin-top:6px}
+.err{color:var(--bad);font-size:12.5px;min-height:18px}
+.dfoot{display:flex;gap:8px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-top:auto;padding-top:10px;border-top:1px solid var(--line)}
+.ro .w-only{display:none!important}
+
+/* toast, pop, tip */
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--pill);color:var(--on-pill);padding:10px 16px;border-radius:999px;font-size:13px;opacity:0;transition:opacity .25s,transform .35s cubic-bezier(.3,1.3,.5,1);z-index:70;max-width:calc(100vw - 32px);pointer-events:none}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.pop{position:absolute;right:0;top:calc(100% + 10px);width:330px;max-width:calc(100vw - 32px);background:var(--surface);border-radius:var(--r-md);box-shadow:0 20px 50px -20px rgba(0,0,0,.35),0 0 0 1px var(--line);padding:8px;z-index:30;animation:rise .35s cubic-bezier(.2,.8,.2,1);max-height:420px;overflow:auto}
+.pop h5{margin:6px 8px;font-size:12px}
+.note{display:flex;gap:10px;padding:8px;border-radius:10px;font-size:12px;cursor:pointer;width:100%;text-align:left}
+.note:hover{background:var(--surface-2)}
+.note small{display:block;color:var(--ink-3);font-size:11px}
+.skel{height:120px;border-radius:var(--r-lg);background:linear-gradient(90deg,var(--surface) 0%,var(--surface-2) 50%,var(--surface) 100%);background-size:200% 100%;animation:sh 1.4s linear infinite}
+@keyframes sh{to{background-position:-200% 0}}
+
+/* 3D hero */
+.hero{position:relative;height:400px;padding:0;overflow:hidden;margin-bottom:16px;background:radial-gradient(90% 120% at 90% 0%,color-mix(in srgb,var(--accent-2) 22%,transparent),transparent 60%),radial-gradient(80% 120% at 0% 100%,color-mix(in srgb,var(--accent) 14%,transparent),transparent 60%),var(--surface)}
+.hero::before{content:"";position:absolute;width:420px;height:420px;border-radius:50%;left:38%;top:-160px;background:radial-gradient(circle,color-mix(in srgb,var(--green) 22%,transparent),transparent 65%);filter:blur(20px);animation:drift 14s ease-in-out infinite alternate;pointer-events:none}
+@keyframes drift{to{transform:translate(120px,60px) scale(1.15)}}
+#scene3d{position:absolute;inset:0;cursor:grab;touch-action:pan-y}
+#scene3d.drag{cursor:grabbing}
+#scene3d canvas{display:block;width:100%!important;height:100%!important}
+.hero-copy{position:absolute;left:24px;top:22px;z-index:2;pointer-events:none;max-width:300px}
+.hero-copy .eyebrow{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.hero-copy h2{margin:6px 0 14px;font-size:clamp(22px,2.4vw,28px);letter-spacing:-.03em;line-height:1.15;font-weight:600;text-wrap:balance}
+.hero-kpis{display:flex;gap:22px}
+.hero-kpis b{display:block;font-size:24px;font-weight:600;letter-spacing:-.03em}
+.hero-kpis span{font-size:11.5px;color:var(--ink-3)}
+.legend3d{position:absolute;left:24px;bottom:18px;z-index:2;display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--ink-2);pointer-events:none}
+.legend3d span{display:inline-flex;align-items:center;gap:6px}
+.legend3d i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.hint3d{position:absolute;right:18px;bottom:16px;z-index:2;font-size:11px;color:var(--ink-3);pointer-events:none;display:flex;align-items:center;gap:6px}
+.tip3d{position:absolute;z-index:3;pointer-events:none;background:var(--pill);color:var(--on-pill);font-size:12px;padding:8px 11px;border-radius:12px;transform:translate(-50%,calc(-100% - 14px));opacity:0;transition:opacity .15s;white-space:nowrap;line-height:1.35}
+.tip3d.show{opacity:1}
+.tip3d small{display:block;opacity:.7;font-size:11px}
+.tilt{transform-style:preserve-3d;will-change:transform}
+.shine{position:relative;overflow:hidden}
+.shine::after{content:"";position:absolute;inset:0;background:radial-gradient(400px circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,.14),transparent 40%);opacity:0;transition:opacity .3s;pointer-events:none}
+.shine:hover::after{opacity:1}
+@media (max-width:720px){.hero{height:420px}.hero-copy{left:16px;top:16px;right:16px}.legend3d{left:16px;bottom:12px}.hint3d{display:none}}
+
+/* responsive */
+@media (max-width:1180px){
+  .g-over{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .g-over .wide{grid-column:span 2}
+  .tcards,.facs{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .runway{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (max-width:900px){
+  .top{grid-template-columns:auto auto;justify-content:space-between}
+  .tabs-wrap{grid-column:1 / -1;grid-row:2;justify-self:stretch}
+  .tabs{margin:0 auto}
+  .user .uname{display:none}
+  .g-two{grid-template-columns:minmax(0,1fr)}
+  .tcards,.facs{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:720px){
+  .body{grid-template-columns:minmax(0,1fr)}
+  .rail{display:none}
+  .g-over{grid-template-columns:minmax(0,1fr)}
+  .g-over .wide{grid-column:auto}
+  .runway{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .fields{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:440px){
+  .brand .bname{display:none}
+  .brand{padding:6px}
+  .tcards,.facs{grid-template-columns:minmax(0,1fr)}
+  .stats{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .search input{width:120px}
+}
+
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+
+<div id="prog"></div>
+<div class="app">
+  <header class="top">
+    <div class="brand"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12 12 4l9 8"/></svg></span><span class="bname">Vestates<small>Tenant registry</small></span></div>
+    <div class="tabs-wrap"><nav class="tabs" id="tabs" aria-label="Sections"><span class="tab-ind" id="ind"></span></nav></div>
+    <div class="actions">
+      <div class="icons">
+        <button class="ibtn" id="btnSearch" aria-label="Find a tenant"><i data-lucide="search"></i></button>
+        <button class="ibtn" id="btnBell" aria-label="Lease alerts"><i data-lucide="bell"></i><span class="dot" id="bellDot" hidden></span></button>
+        <button class="ibtn" id="btnTheme2" aria-label="Toggle theme"><i data-lucide="sun-moon"></i></button>
+        <div id="popHost"></div>
+      </div>
+      <div class="user">
+        <span class="avatar" id="meAv" style="background:linear-gradient(140deg,#3E7BE6,#1F4FB4)">V</span>
+        <span class="uname"><b id="meName">Facilities team</b><small><span class="sync" id="sync">Connecting…</span></small></span>
+      </div>
+    </div>
+  </header>
+  <div class="body">
+    <aside class="rail">
+      <div class="rail-group">
+        <button class="rbtn" data-theme-set="light" aria-label="Light theme"><i data-lucide="sun"></i></button>
+        <button class="rbtn" data-theme-set="dark" aria-label="Dark theme"><i data-lucide="moon"></i></button>
+      </div>
+      <div class="rail-group" id="railNav"></div>
+      <div class="rail-group w-only">
+        <button class="rbtn" data-new="1" aria-label="Add tenant"><i data-lucide="user-plus"></i></button>
+        <button class="rbtn" id="btnExport" aria-label="Export CSV"><i data-lucide="download"></i></button>
+        <button class="rbtn" id="btnSignOut" aria-label="Sign out" hidden><i data-lucide="log-out"></i></button>
+      </div>
+    </aside>
+    <main id="view"></main>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<div id="modalHost"></div>
+
+<script>
+/* ===== Firebase settings =====
+   Paste the config from Firebase console → Project settings → Your apps → Web app.
+   Use the SAME project as the lease dashboard: the registry reads and edits the
+   dashboard's own data (units, config) and uses its team list (members) for access. */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyAigN3H-sls_BriSwtnC1quELnUGxLp1Y8",
+  authDomain: "lease-dashboard-302be.firebaseapp.com",
+  projectId: "lease-dashboard-302be",
+  storageBucket: "lease-dashboard-302be.firebasestorage.app",
+  messagingSenderId: "20481569999",
+  appId: "1:20481569999:web:0a0b5b9a97c196d3bd33ba"
+};
+</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+const AREAS={'Takum Towers':'Wuse 2','Kingstown, 43 Sultan Drive':'Lifecamp','XII Lungi':'Wuse 2','Venus':'Maitama','Anchorage Hills':'Asokoro','Brains and Hammers':'Lifecamp','Hills':'Maitama','April':'Jabi','Bauhaus':'Guzape','Valley':'Asokoro','Niche':'Garki 2','Stazia Court':'Maitama','Seven by Vestates (Libreville Cres.)':'Wuse 2','12 Baba Umar Faruk II Cres., Jahi':'Jahi','Tranquillo':'Asokoro','7-Fifteen':'Lakeside Estate, Jabi'};
+const STATUS={occupied:'Occupied',vacant:'Vacant',vacated:'Vacated',not_managed:'Not managed'};
+const TYPES=['Individual','Company','Embassy'];
+const TYPE_COL={Individual:'var(--accent)',Company:'var(--green)',Embassy:'var(--amber)'};
+const PAGES=[{k:'overview',t:'Overview',i:'layout-grid'},{k:'tenants',t:'Tenants',i:'users'},{k:'facilities',t:'Facilities',i:'building-2'},{k:'renewals',t:'Renewals',i:'calendar-clock'},{k:'reports',t:'Reports',i:'file-bar-chart'}];
+const S={page:'overview',rows:[],props:[],colors:{},loaded:{t:false,c:false},offline:false,canWrite:true,
+  q:'',fac:'all',st:'all',ty:'all',bucket:'all',view:'table',animate:true};
+let DB=null,DL=null,pendingRender=false,writing=0,lastErr='';
+let COL_T='tenants',DOC_C='config/main',FB=false,UNSUB=[];
+
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const naira=(v,dec=0)=>'₦'+Number(v||0).toLocaleString('en-NG',{minimumFractionDigits:dec,maximumFractionDigits:dec});
+const short=v=>{v=v||0;const a=Math.abs(v);return '₦'+(a>=1e9?(v/1e9).toFixed(2)+'bn':a>=1e6?(v/1e6).toFixed(1)+'m':a>=1e3?Math.round(v/1e3)+'k':Math.round(v))};
+const title=s=>String(s||'').toLowerCase().replace(/(^|[\s(\/\-.&])([a-z])/g,(m,a,b)=>a+b.toUpperCase());
+const ini=n=>{const w=String(n||'?').replace(/[^A-Za-z ]/g,' ').trim().split(/\s+/).filter(Boolean);return ((w[0]||'?')[0]+((w[1]||'')[0]||'')).toUpperCase()};
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function icons(){try{lucide.createIcons()}catch(e){}}
+function today(){const d=new Date();d.setHours(0,0,0,0);return d}
+function pd(s){if(!s)return null;const d=new Date(s+'T00:00:00');return isNaN(d)?null:d}
+function fdate(s){const d=pd(s);return d?d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'—'}
+function daysLeft(t){const e=pd(t.end);return e?Math.round((e-today())/864e5):null}
+function termMonths(t){const s=pd(t.start),e=pd(t.end);if(!s||!e||e<s)return null;return Math.round(((e-s)/864e5+1)/30.4375)}
+function years(t){if(t.status!=='occupied'||t.billing==='monthly')return 1;const m=termMonths(t);if(m===null)return 1;const y=Math.round(m/12);return y>=2?y:1}
+function annual(t){return t.status==='occupied'?(t.rent||0)/years(t):0}
+function annualSc(t){return t.status==='occupied'?(t.sc||0)/years(t):0}
+function bucket(t){
+  if(t.status!=='occupied')return null;
+  if(t.billing==='monthly'||!t.end)return 'open';
+  const d=daysLeft(t);
+  if(t.renewal==='Renewed'&&d<=90)return 'renewed';
+  return d<0?'expired':d<=30?'d30':d<=60?'d60':d<=90?'d90':'later';
+}
+const BUCKETS=[['expired','Expired','var(--bad)','Past end date, not renewed'],['d30','0–30 days','var(--bad)','Ending this month'],['d60','31–60 days','var(--warn)','Start talks now'],['d90','61–90 days','var(--amber)','Plan ahead'],['later','90+ days','var(--good)','Secure for now']];
+function facColor(p){return S.colors[p]||'#8892A6'}
+function facName(p){return String(p||'Unassigned').replace(/, 43 Sultan Drive/,'').replace(/ \(Libreville Cres\.\)/,'').replace(/^12 Baba Umar Faruk II Cres\., /,'')}
+function tenantName(t){return t.tenant?title(t.tenant):(t.status==='vacant'?'Vacant unit':t.status==='not_managed'?'Not managed':'Unnamed')}
+function unitName(t){return t.unit?title(t.unit):'Unit not named'}
+function avatar(t,size){const g=t.status==='occupied'?`linear-gradient(140deg,${facColor(t.property)},color-mix(in srgb,${facColor(t.property)} 60%,#000))`:'var(--surface-2)';return `<span class="avatar" style="background:${g};${t.status!=='occupied'?'color:var(--ink-3);border:1.5px dashed var(--line);':''}${size?`width:${size}px;height:${size}px`:''}">${t.status==='occupied'?esc(ini(t.tenant)):'<i data-lucide="door-open" style="width:14px;height:14px"></i>'}</span>`}
+function statusChip(t){
+  if(t.status!=='occupied')return `<span class="chip ${t.status==='vacated'?'warn':''}">${STATUS[t.status]||t.status}</span>`;
+  const b=bucket(t),d=daysLeft(t);
+  if(b==='open')return '<span class="chip blue">Monthly</span>';
+  if(b==='renewed')return '<span class="chip good">Renewed</span>';
+  if(b==='expired')return `<span class="chip bad">Expired ${-d}d ago</span>`;
+  if(b==='d30')return `<span class="chip bad">${d}d left</span>`;
+  if(b==='d60'||b==='d90')return `<span class="chip warn">${d}d left</span>`;
+  return '<span class="chip good">Active</span>';
+}
+let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2600)}
+function facilities(){const set=[...S.props];S.rows.forEach(r=>{if(r.property&&!set.includes(r.property))set.push(r.property)});return set}
+function greet(){const h=new Date().getHours();return h<12?'Good morning':h<17?'Good afternoon':'Good evening'}
+function setSync(){const el=$('#sync');let t,c='sync';
+  if(S.needAuth){t='Signed out'}else if(S.offline){t='Data unavailable';c+=' err'}else if(!S.loaded.t){t='Loading…';c+=' busy'}else if(!S.canWrite){t='View only'}else if(writing){t='Saving…';c+=' busy'}else if(lastErr){t=lastErr;c+=' err'}else{t='Saved for everyone';c+=' ok'}
+  el.className=c;el.textContent=t}
+
+/* ---------- nav ---------- */
+function buildNav(){
+  PAGES.forEach(p=>{const b=document.createElement('button');b.className='tab';b.textContent=p.t;b.dataset.go=p.k;$('#tabs').appendChild(b)});
+  $('#railNav').innerHTML=PAGES.map(p=>`<button class="rbtn" data-go="${p.k}" aria-label="${p.t}"><i data-lucide="${p.i}"></i></button>`).join('');
+}
+function moveInd(){const a=document.querySelector('.tab[aria-current="page"]'),ind=$('#ind');if(!a)return;ind.style.width=a.offsetWidth+'px';ind.style.transform=`translateX(${a.offsetLeft}px)`}
+function go(k,o={}){
+  S.page=k;S.animate=true;
+  document.querySelectorAll('.tab').forEach(t=>{if(t.dataset.go===k)t.setAttribute('aria-current','page');else t.removeAttribute('aria-current')});
+  document.querySelectorAll('#railNav .rbtn').forEach(b=>b.classList.toggle('on',b.dataset.go===k));
+  moveInd();render();
+  try{history.replaceState(null,'','#'+k)}catch(e){}
+  if(!o.noScroll)window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ---------- views ---------- */
+const head=(t,p,btn='')=>`<div class="head rv" style="--i:0"><div><h1>${t}</h1><p>${p}</p></div>${btn}</div>`;
+function loadingView(){return head('Tenant registry','Loading tenant records…')+`<div class="g-over">${'<div class="skel"></div>'.repeat(6)}</div>`}
+function offlineView(){return head('Tenant registry','')+`<section class="card"><div class="empty"><b style="color:var(--ink)">Tenant data isn't available.</b><br>${esc(S.offlineMsg||'Check your connection and reload the page.')}</div></section>`}
+function verifyView(){return `<div style="max-width:440px;margin:40px auto"><section class="card rv" style="padding:26px"><h3 style="margin:0 0 6px;font-family:var(--f-display);font-size:22px">Confirm your email</h3><p class="muted" style="font-size:13px">For security, confirm that <b style="color:var(--ink)">${esc(S.verify)}</b> is yours. We've sent a link to that inbox. Open it, then come back and press the button below.</p><div class="tools" style="margin-top:14px"><button class="btn btn-dark" id="vfDone">I've confirmed it</button><button class="btn btn-ghost" id="vfResend">Send the link again</button><button class="btn btn-ghost" id="vfOut">Sign out</button></div><div class="err" id="vfMsg" style="margin-top:10px"></div></section></div>`}
+function authMsg(c){c=c||'';
+  if(/invalid-credential|wrong-password|user-not-found|invalid-email|invalid-login/.test(c))return 'That email and password don\'t match an account. Check them, or ask an admin to create your account.';
+  if(/too-many-requests/.test(c))return 'Too many attempts. Wait a few minutes and try again.';
+  if(/popup-closed|cancelled-popup/.test(c))return '';
+  if(/popup-blocked/.test(c))return 'Your browser blocked the sign-in window. Allow pop-ups for this site and try again.';
+  if(/unauthorized-domain/.test(c))return 'This web address isn\'t allowed to sign in yet. In Firebase, add it under Authentication > Settings > Authorized domains.';
+  if(/operation-not-allowed/.test(c))return 'This sign-in method is switched off in Firebase (Authentication > Sign-in method).';
+  if(/network/.test(c))return 'No internet connection. Check your connection and try again.';
+  return 'Sign-in failed ('+c+').';}
+function signInView(){return `<div style="max-width:420px;margin:40px auto"><section class="card rv" style="padding:26px"><div class="dhead" style="margin-bottom:18px"><span class="brand-mark" style="width:44px;height:44px"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px"><path d="M3 12 12 4l9 8"/></svg></span><div><h3 style="margin:0;font-size:20px">Sign in</h3><div class="muted">Vestates tenant registry · team members only</div></div></div>
+<button class="btn btn-dark" id="siGoogle" style="width:100%;padding:11px"><svg viewBox="0 0 24 24" width="16" height="16"><path fill="#4285F4" d="M22.6 12.2c0-.8-.1-1.5-.2-2.2H12v4.2h5.9a5 5 0 0 1-2.2 3.3v2.7h3.6c2.1-1.9 3.3-4.8 3.3-8z"/><path fill="#34A853" d="M12 23c3 0 5.5-1 7.3-2.7l-3.6-2.7c-1 .7-2.2 1.1-3.7 1.1-2.9 0-5.3-1.9-6.2-4.5H2.1v2.8A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.8 14.2a6.6 6.6 0 0 1 0-4.3V7.1H2.1a11 11 0 0 0 0 9.9l3.7-2.8z"/><path fill="#EA4335" d="M12 5.4c1.6 0 3.1.6 4.2 1.7l3.2-3.2A11 11 0 0 0 2.1 7.1l3.7 2.8C6.7 7.3 9.1 5.4 12 5.4z"/></svg>Continue with Google</button>
+<div class="muted" style="text-align:center;margin:14px 0">or with email</div>
+<form id="signin" class="fields" style="grid-template-columns:1fr" novalidate><label class="field">Email<input id="siEmail" type="email" autocomplete="username" required></label><label class="field">Password<input id="siPass" type="password" autocomplete="current-password" required></label><div class="err" id="siErr"></div><button class="btn btn-ghost" type="submit" id="siBtn">Sign in</button><span class="tools" style="justify-content:space-between"><button type="button" class="copy" id="siReset">Forgot your password?</button><span class="muted">Same account as the lease dashboard</span></span></form></section></div>`}
+function emptyView(){return head('Tenant registry','No tenants recorded yet.')+`<section class="card"><div class="empty"><b style="color:var(--ink)">The registry is empty.</b><br>Add your first tenant and it will appear here for everyone with access.<br><br><span class="tools" style="justify-content:center"><button class="btn btn-dark w-only" data-new="1"><i data-lucide="user-plus"></i>Add tenant</button></span></div></section>`}
+
+function stats(){
+  const R=S.rows,occ=R.filter(r=>r.status==='occupied'),managed=R.filter(r=>r.status!=='not_managed');
+  const vac=R.filter(r=>r.status==='vacant'||r.status==='vacated');
+  const roll=occ.reduce((a,r)=>a+annual(r),0),sc=occ.reduce((a,r)=>a+annualSc(r),0);
+  const bk={};BUCKETS.forEach(([k])=>bk[k]=occ.filter(r=>bucket(r)===k));
+  return {R,occ,managed,vac,roll,sc,bk,rate:managed.length?occ.length/managed.length:0};
+}
+function vOverview(){
+  const s=stats(),C=2*Math.PI*44,soon=s.bk.expired.length+s.bk.d30.length+s.bk.d60.length+s.bk.d90.length;
+  const types=TYPES.map(t=>({t,n:s.occ.filter(r=>(r.type||'Individual')===t).length}));
+  const facs=facilities().map(p=>({p,v:s.occ.filter(r=>r.property===p).reduce((a,r)=>a+annual(r),0)})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v);
+  const maxF=facs[0]?facs[0].v:1;
+  const ending=s.occ.filter(r=>['expired','d30','d60','d90'].includes(bucket(r))).sort((a,b)=>daysLeft(a)-daysLeft(b)).slice(0,8);
+  return head(`${greet()}`,`${s.occ.length} occupied units across ${facilities().length} Vestates facilities.`,`<button class="btn btn-dark rv w-only" style="--i:1" data-new="1"><i data-lucide="user-plus"></i>Add tenant</button>`)+
+  `<section class="card hero rv" style="--i:1">
+    <div id="scene3d" aria-label="3D model of the Vestates portfolio: one tower per facility, one floor per unit"></div>
+    <div class="hero-copy"><div class="eyebrow">Portfolio · live</div><h2>Every residence, floor by floor</h2>
+      <div class="hero-kpis"><div><b class="num" data-count="${s.rate*100}" data-fmt="pct">${Math.round(s.rate*100)}%</b><span>Occupied</span></div><div><b class="num" data-count="${s.roll}" data-fmt="short">${short(s.roll)}</b><span>Rent per year</span></div><div><b class="num" data-count="${soon}" data-fmt="int">${soon}</b><span>Need renewal</span></div></div></div>
+    <div class="legend3d"><span><i style="background:linear-gradient(90deg,#e6194b,#4363d8,#3cb44b)"></i>Occupied (facility colour)</span><span><i style="background:var(--amber)"></i>Lease ends ≤ 90 days</span><span><i style="background:var(--line);border:1px solid var(--ink-3)"></i>Vacant</span></div>
+    <div class="hint3d"><i data-lucide="move-3d" style="width:14px;height:14px"></i>Drag to rotate · click a tower</div>
+    <div class="tip3d" id="tip3d"></div>
+  </section>
+  <div class="g-over">
+    <section class="card rv" style="--i:1">
+      <div class="card-h"><div><div class="card-t">Occupancy</div><div class="card-s">Units Vestates manages</div></div><span class="chip ${s.rate>=.9?'good':s.rate>=.75?'warn':'bad'}">${s.managed.length} units</span></div>
+      <div class="occ-wrap">
+        <div class="ring"><svg viewBox="0 0 100 100"><circle class="ring-bg" cx="50" cy="50" r="44" fill="none" stroke-width="10"/><circle class="ring-fg" cx="50" cy="50" r="44" fill="none" stroke-width="10" stroke-linecap="round" stroke-dasharray="${C}" style="stroke-dashoffset:${S.animate&&!reduce?C:C*(1-s.rate)}" data-off="${C*(1-s.rate)}"/></svg><div class="ring-c"><b class="num">${Math.round(s.rate*100)}%</b><small>occupied</small></div></div>
+        <div class="mix">${types.map(x=>`<div class="mix-row"><i style="background:${TYPE_COL[x.t]}"></i><span>${x.t}</span><b class="num">${x.n}</b></div>`).join('')}
+          <div class="mix-row"><i style="background:var(--line)"></i><span>Vacant</span><b class="num">${s.vac.length}</b></div></div>
+      </div>
+      <div class="split">${types.map(x=>`<span style="flex:${x.n};background:${TYPE_COL[x.t]}"></span>`).join('')}<span style="flex:${s.vac.length};background:var(--line)"></span></div>
+    </section>
+    <section class="stats rv" style="--i:2">
+      <div class="stat hot lift"><div class="stat-top"><span>Annual rent roll</span><span class="ic"><i data-lucide="banknote" style="width:13px;height:13px"></i></span></div><div class="mid num" data-count="${s.roll}">${short(s.roll)}</div><span class="muted">+ ${short(s.sc)} service charge</span></div>
+      <button class="stat lift" data-filter="st:occupied"><div class="stat-top"><span>Occupied units</span><span class="ic"><i data-lucide="key-round" style="width:13px;height:13px"></i></span></div><div class="mid num">${s.occ.length}</div><span class="muted">${s.occ.filter(r=>r.type==='Embassy').length} embassies, ${s.occ.filter(r=>r.type==='Company').length} companies</span></button>
+      <button class="stat lift" data-filter="st:vacant"><div class="stat-top"><span>Vacant units</span><span class="ic"><i data-lucide="door-open" style="width:13px;height:13px"></i></span></div><div class="mid num">${s.vac.length}</div><span class="muted">Ready to let or recently vacated</span></button>
+      <button class="stat lift" data-go="renewals"><div class="stat-top"><span>Leases ending ≤ 90 days</span><span class="ic"><i data-lucide="calendar-clock" style="width:13px;height:13px"></i></span></div><div class="mid num" style="color:${soon?'var(--bad)':'inherit'}">${soon}</div><span class="muted">${s.bk.expired.length} already past end date</span></button>
+    </section>
+    <section class="card rv" style="--i:3">
+      <div class="card-h"><div><div class="card-t">Rent roll by facility</div><div class="card-s">Annual rent from occupied units</div></div></div>
+      ${facs.slice(0,9).map((f,j)=>`<div class="hbar" data-fac="${esc(f.p)}"><span class="nm">${esc(facName(f.p))}</span><span class="track"><i class="bar-g" style="--j:${j};width:${f.v/maxF*100}%;background:${facColor(f.p)}"></i></span><span class="v num">${short(f.v)}</span></div>`).join('')}
+      ${facs.length>9?`<button class="btn btn-ghost btn-sm" data-go="reports" style="margin-top:8px">See all ${facs.length} facilities</button>`:''}
+    </section>
+    <section class="card rv" style="--i:4">
+      <div class="card-h"><div><div class="card-t">Lease expiry runway</div><div class="card-s">Tap a band to see those tenants</div></div></div>
+      <div class="runway" style="grid-template-columns:repeat(auto-fit,minmax(92px,1fr))">${BUCKETS.map(([k,l,c,sub])=>`<button class="rw" style="--c:${c}" data-bucket="${k}"><b class="num">${s.bk[k].length}</b><span>${l}</span><small>${short(s.bk[k].reduce((a,r)=>a+annual(r),0))}/yr</small></button>`).join('')}</div>
+    </section>
+    <section class="card rv wide" style="--i:5">
+      <div class="card-h"><div><div class="card-t">Leases ending soonest</div><div class="card-s">Expired or ending within 90 days, not yet renewed</div></div><button class="btn btn-ghost btn-sm" data-go="renewals">Open renewals<i data-lucide="arrow-right"></i></button></div>
+      ${ending.length?`<div class="table-wrap">${tenantTable(ending,true)}</div>`:'<div class="empty">No leases end in the next 90 days.</div>'}
+    </section>
+  </div>`;
+}
+function tenantTable(list,compact){
+  return `<table><thead><tr><th>Tenant</th><th>Facility · Unit</th>${compact?'':'<th>Type</th>'}<th>Lease</th><th class="r">Rent / year</th><th>Status</th></tr></thead><tbody>${list.map(t=>`<tr data-open="${esc(t.id)}">
+    <td><div class="who">${avatar(t)}<div style="min-width:0"><b>${esc(tenantName(t))}</b><small>${esc(t.org?title(t.org):(t.phone||t.email||'No contact on file'))}</small></div></div></td>
+    <td><span class="fac"><i style="background:${facColor(t.property)}"></i>${esc(facName(t.property))}</span><div class="muted">${esc(unitName(t))}</div></td>
+    ${compact?'':`<td>${esc(t.status==='occupied'?t.type||'—':'—')}</td>`}
+    <td style="white-space:nowrap">${t.status==='occupied'?(t.billing==='monthly'?'Monthly from '+fdate(t.start):`${fdate(t.start)} → ${fdate(t.end)}`):(t.vacatedOn?'Left '+fdate(t.vacatedOn):'—')}</td>
+    <td class="r num" style="font-weight:600">${t.status==='occupied'?naira(annual(t)):'—'}${t.currency&&t.currency!=='NGN'&&t.fxRent?`<div class="muted">${t.currency} ${Number(t.fxRent).toLocaleString()}</div>`:''}</td>
+    <td>${statusChip(t)}</td></tr>`).join('')}</tbody></table>`;
+}
+function filtered(){
+  const q=S.q.trim().toLowerCase();
+  return S.rows.filter(t=>(S.fac==='all'||t.property===S.fac)&&(S.st==='all'||(S.st==='vacant'?(t.status==='vacant'||t.status==='vacated'):t.status===S.st))&&(S.ty==='all'||(t.status==='occupied'&&(t.type||'Individual')===S.ty))&&(S.bucket==='all'||bucket(t)===S.bucket)
+    &&(!q||[t.tenant,t.org,t.unit,t.property,t.phone,t.email,t.group].join(' ').toLowerCase().includes(q)))
+   .sort((a,b)=>facilities().indexOf(a.property)-facilities().indexOf(b.property)||String(a.unit).localeCompare(String(b.unit),undefined,{numeric:true}));
+}
+function vTenants(){
+  const list=filtered(),R=S.rows,bl=BUCKETS.find(b=>b[0]===S.bucket);
+  const cnt={all:R.length,occupied:R.filter(r=>r.status==='occupied').length,vacant:R.filter(r=>r.status==='vacant'||r.status==='vacated').length,not_managed:R.filter(r=>r.status==='not_managed').length};
+  return head('Tenants','Every unit and who is in it. Tap a row to see or edit the record.',`<div class="tools rv" style="--i:1"><button class="btn btn-ghost" id="btnExport2"><i data-lucide="download"></i>Export CSV</button><button class="btn btn-dark w-only" data-new="1"><i data-lucide="user-plus"></i>Add tenant</button></div>`)+
+  `<section class="card rv" style="--i:1">
+    <div class="card-h" style="align-items:center">
+      <div class="tools">
+        <label class="search"><i data-lucide="search" style="width:14px;height:14px"></i><input id="q" placeholder="Name, unit, phone, organisation" value="${esc(S.q)}" aria-label="Search tenants"></label>
+        <select class="sel" id="facSel" aria-label="Facility"><option value="all">All facilities</option>${facilities().map(p=>`<option value="${esc(p)}" ${S.fac===p?'selected':''}>${esc(facName(p))}</option>`).join('')}</select>
+        <select class="sel" id="tySel" aria-label="Tenant type"><option value="all">All types</option>${TYPES.map(t=>`<option ${S.ty===t?'selected':''}>${t}</option>`).join('')}</select>
+      </div>
+      <div class="seg" id="viewSeg"><button class="${S.view==='table'?'on':''}" data-view="table"><i data-lucide="list" style="width:13px;height:13px"></i>Table</button><button class="${S.view==='cards'?'on':''}" data-view="cards"><i data-lucide="layout-grid" style="width:13px;height:13px"></i>Cards</button></div>
+    </div>
+    <div class="tools" style="margin-bottom:12px">
+      <div class="seg">${[['all','All'],['occupied','Occupied'],['vacant','Vacant'],['not_managed','Not managed']].map(([k,l])=>`<button class="${S.st===k?'on':''}" data-st="${k}">${l}<small>${cnt[k]}</small></button>`).join('')}</div>
+      ${bl?`<span class="chip warn">Lease band: ${bl[1]} <button data-bucket="all" aria-label="Clear lease band" style="display:inline-flex"><i data-lucide="x" style="width:12px;height:12px"></i></button></span>`:''}
+      ${(S.q||S.fac!=='all'||S.ty!=='all'||S.st!=='all'||S.bucket!=='all')?'<button class="btn btn-ghost btn-sm" id="clearF">Clear filters</button>':''}
+    </div>
+    ${!list.length?`<div class="empty">No units match these filters. Clear the search or pick another facility.</div>`:S.view==='table'?`<div class="table-wrap">${tenantTable(list)}</div>`:`<div class="tcards">${list.map((t,k)=>`<article class="card tcard lift" style="background:var(--surface-2);box-shadow:none" data-open="${esc(t.id)}" tabindex="0">
+        <span class="st">${statusChip(t)}</span>${avatar(t)}<h4>${esc(tenantName(t))}</h4>
+        <span class="fac muted"><i style="background:${facColor(t.property)}"></i>${esc(facName(t.property))} · ${esc(unitName(t))}</span>
+        ${t.phone?`<button class="copy" data-copy="${esc(t.phone)}"><i data-lucide="phone"></i>${esc(t.phone)}</button>`:''}
+        ${t.email?`<button class="copy" data-copy="${esc(t.email)}" style="max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><i data-lucide="mail"></i>${esc(t.email)}</button>`:''}
+        <div class="kv"><span>${t.status==='occupied'?'Ends '+(t.end?fdate(t.end):'—'):STATUS[t.status]}</span><b class="num">${t.status==='occupied'?short(annual(t))+'/yr':''}</b></div>
+      </article>`).join('')}</div>`}
+    <div class="count-line"><span>Showing ${list.length} of ${R.length} units</span><span class="num">${short(list.reduce((a,t)=>a+annual(t),0))} annual rent in view</span></div>
+  </section>`;
+}
+function vFacilities(){
+  const C=2*Math.PI*44;
+  const cards=facilities().map(p=>{const u=S.rows.filter(r=>r.property===p),m=u.filter(r=>r.status!=='not_managed'),o=u.filter(r=>r.status==='occupied');
+    return {p,u,m,o,rate:m.length?o.length/m.length:0,roll:o.reduce((a,r)=>a+annual(r),0),soon:o.filter(r=>['expired','d30','d60','d90'].includes(bucket(r))).length}});
+  return head('Facilities',`${cards.length} Vestates residences. Tap one to see its tenants.`)+
+  `<div class="facs">${cards.map((f,i)=>`<section class="card facc rv lift" style="--i:${1+i}" data-fac="${esc(f.p)}" tabindex="0">
+    <div class="ftop"><span class="ic" style="background:color-mix(in srgb,${facColor(f.p)} 16%,transparent);color:${facColor(f.p)}"><i data-lucide="building-2" style="width:14px;height:14px"></i></span><span class="chip">${esc(AREAS[f.p]||'Abuja')}</span></div>
+    <div class="ring"><svg viewBox="0 0 100 100"><circle class="ring-bg" cx="50" cy="50" r="44" fill="none" stroke-width="9"/><circle class="ring-fg" cx="50" cy="50" r="44" fill="none" stroke-width="9" stroke-linecap="round" stroke-dasharray="${C}" style="stroke:${facColor(f.p)};stroke-dashoffset:${S.animate&&!reduce?C:C*(1-f.rate)}" data-off="${C*(1-f.rate)}"/></svg><div class="ring-c"><b class="num">${f.m.length?Math.round(f.rate*100)+'%':'—'}</b><small>occupied</small></div></div>
+    <h4>${esc(facName(f.p))}</h4>
+    ${f.soon?`<span class="chip warn">${f.soon} lease${f.soon>1?'s':''} ending ≤ 90d</span>`:'<span class="chip good">No leases ending soon</span>'}
+    <div class="meta"><span>Units<b class="num">${f.o.length}/${f.m.length}</b></span><span>Rent roll<b class="num">${short(f.roll)}</b></span></div>
+  </section>`).join('')}</div>`;
+}
+function vRenewals(){
+  const occ=S.rows.filter(r=>r.status==='occupied'&&r.billing!=='monthly'&&r.end);
+  const due=occ.filter(r=>daysLeft(r)<=120).sort((a,b)=>daysLeft(a)-daysLeft(b));
+  const rcount=v=>due.filter(r=>(r.renewal||'')===v).length;
+  const row=t=>{const d=daysLeft(t),cls=(t.renewal||'').toLowerCase().replace('in talks','talks');
+    return `<tr data-open="${esc(t.id)}"><td><div class="who">${avatar(t)}<div style="min-width:0"><b>${esc(tenantName(t))}</b><small>${esc(facName(t.property))} · ${esc(unitName(t))}</small></div></div></td>
+    <td style="white-space:nowrap">${fdate(t.end)}</td><td class="days num" style="color:${d<0?'var(--bad)':d<=30?'var(--bad)':d<=90?'var(--warn)':'var(--ink-2)'}">${d<0?-d+' days ago':d===0?'Today':d+' days'}</td>
+    <td class="r num">${naira(annual(t))}</td><td>${t.phone?`<button class="copy" data-copy="${esc(t.phone)}"><i data-lucide="phone"></i>${esc(t.phone)}</button>`:'<span class="muted">No phone</span>'}</td>
+    <td><select class="rsel ${cls}" data-renew="${esc(t.id)}" aria-label="Renewal status" ${S.canWrite?'':'disabled'}>${['','In talks','Renewed','Leaving'].map(v=>`<option value="${v}" ${(t.renewal||'')===v?'selected':''}>${v||'Not started'}</option>`).join('')}</select></td>
+    <td class="w-only">${t.renewal!=='Renewed'&&(t.renewal==='Leaving'||d<0)?`<button class="btn btn-ghost btn-sm" data-vacate="${esc(t.id)}">Mark vacated</button>`:''}</td></tr>`};
+  return head('Renewals','Leases past their end date or ending within 120 days. Track each conversation here.')+
+  `<div class="stats rv" style="--i:1;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-bottom:16px">
+    <div class="stat"><div class="stat-top">To action</div><div class="mid num">${due.length}</div><span class="muted">${short(due.reduce((a,r)=>a+annual(r),0))} rent per year at stake</span></div>
+    <div class="stat"><div class="stat-top">Not started</div><div class="mid num" style="color:var(--bad)">${rcount('')}</div><span class="muted">No conversation logged</span></div>
+    <div class="stat"><div class="stat-top">In talks</div><div class="mid num" style="color:var(--warn)">${rcount('In talks')}</div><span class="muted">Negotiating terms</span></div>
+    <div class="stat"><div class="stat-top">Renewed</div><div class="mid num" style="color:var(--good)">${rcount('Renewed')}</div><span class="muted">Update dates and rent in the record</span></div>
+    <div class="stat"><div class="stat-top">Leaving</div><div class="mid num">${rcount('Leaving')}</div><span class="muted">Mark vacated once keys are back</span></div>
+  </div>
+  <section class="card rv" style="--i:2"><div class="card-h"><div class="card-t">Renewal pipeline</div><span class="muted">Sorted by end date</span></div>
+  ${due.length?`<div class="table-wrap"><table><thead><tr><th>Tenant</th><th>Lease ends</th><th>Time left</th><th class="r">Rent / year</th><th>Phone</th><th>Renewal</th><th class="w-only"></th></tr></thead><tbody>${due.map(row).join('')}</tbody></table></div>`:'<div class="empty">No leases end in the next 120 days.</div>'}</section>`;
+}
+function vReports(){
+  const s=stats();
+  const byF=facilities().map(p=>{const u=S.rows.filter(r=>r.property===p),o=u.filter(r=>r.status==='occupied'),m=u.filter(r=>r.status!=='not_managed');return {p,o:o.length,m:m.length,roll:o.reduce((a,r)=>a+annual(r),0),sc:o.reduce((a,r)=>a+annualSc(r),0)}}).sort((a,b)=>b.roll-a.roll);
+  const byT=TYPES.map(t=>{const o=s.occ.filter(r=>(r.type||'Individual')===t);return {t,n:o.length,roll:o.reduce((a,r)=>a+annual(r),0)}});
+  const cur={};s.occ.forEach(r=>{const c=r.currency||'NGN';cur[c]=cur[c]||{n:0,roll:0};cur[c].n++;cur[c].roll+=annual(r)});
+  const grp={};s.occ.forEach(r=>{const k=title(r.group||r.org||r.tenant||'');if(!k)return;grp[k]=grp[k]||{n:0,roll:0};grp[k].n++;grp[k].roll+=annual(r)});
+  const top=Object.entries(grp).sort((a,b)=>b[1].roll-a[1].roll).slice(0,8),maxT=top[0]?top[0][1].roll:1;
+  return head('Reports','Where the rent comes from, by facility, tenant type and currency.',`<button class="btn btn-ghost rv" style="--i:1" id="btnExport3"><i data-lucide="download"></i>Export CSV</button>`)+
+  `<div class="g-two">
+   <section class="card rv" style="--i:1"><div class="card-h"><div><div class="card-t">Rent roll by facility</div><div class="card-s">Annual figures from occupied units</div></div></div>
+    <div class="table-wrap"><table style="min-width:480px"><thead><tr><th>Facility</th><th class="r">Occupied</th><th class="r">Rent / yr</th><th class="r">Service charge / yr</th><th class="r">Share</th></tr></thead><tbody>
+    ${byF.map(f=>`<tr data-fac="${esc(f.p)}"><td><span class="fac"><i style="background:${facColor(f.p)}"></i>${esc(facName(f.p))}</span></td><td class="r num">${f.o}/${f.m}</td><td class="r num" style="font-weight:600">${short(f.roll)}</td><td class="r num">${f.sc?short(f.sc):'—'}</td><td class="r num">${s.roll?(f.roll/s.roll*100).toFixed(1):0}%</td></tr>`).join('')}
+    <tr style="cursor:default"><td><b>Total</b></td><td class="r num"><b>${s.occ.length}/${s.managed.length}</b></td><td class="r num"><b>${short(s.roll)}</b></td><td class="r num"><b>${short(s.sc)}</b></td><td class="r num"><b>100%</b></td></tr></tbody></table></div></section>
+   <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+    <section class="card rv" style="--i:2"><div class="card-h"><div class="card-t">Largest tenants by rent</div><span class="muted">Grouped by company or tenant</span></div>
+     ${top.map(([k,v],j)=>`<div class="hbar" style="cursor:default"><span class="nm" title="${esc(k)}">${esc(k)}</span><span class="track"><i class="bar-g" style="--j:${j};width:${v.roll/maxT*100}%"></i></span><span class="v num">${short(v.roll)}</span></div>`).join('')}</section>
+    <section class="card rv" style="--i:3"><div class="card-h"><div class="card-t">Tenant type</div></div>
+     ${byT.map(x=>`<div class="mix-row" style="padding:5px 0"><i style="background:${TYPE_COL[x.t]}"></i><span>${x.t} <span class="muted">· ${x.n} units</span></span><b class="num">${short(x.roll)} <span class="muted">${s.roll?Math.round(x.roll/s.roll*100):0}%</span></b></div>`).join('')}
+     <div class="split">${byT.map(x=>`<span style="flex:${x.roll||0.0001};background:${TYPE_COL[x.t]}"></span>`).join('')}</div></section>
+    <section class="card rv" style="--i:4"><div class="card-h"><div><div class="card-t">Lease currency</div><div class="card-s">Rent shown in naira equivalent</div></div></div>
+     ${Object.entries(cur).sort((a,b)=>b[1].roll-a[1].roll).map(([c,v])=>`<div class="mix-row" style="padding:5px 0"><i style="background:${c==='NGN'?'var(--green)':c==='USD'?'var(--accent)':'var(--amber)'}"></i><span>${c} <span class="muted">· ${v.n} leases</span></span><b class="num">${short(v.roll)}</b></div>`).join('')}</section>
+   </div></div>`;
+}
+const VIEWS={overview:vOverview,tenants:vTenants,facilities:vFacilities,renewals:vRenewals,reports:vReports};
+function render(){
+  const v=$('#view');
+  const a=document.activeElement;
+  if(!S.animate&&a&&v.contains(a)&&/INPUT|SELECT|TEXTAREA/.test(a.tagName)&&a.id!=='q'){pendingRender=true;return}
+  let qPos=null;if(a&&a.id==='q')qPos=a.selectionStart;
+  v.classList.add('still');
+  v.innerHTML=S.needAuth?signInView():S.verify?verifyView():S.offline?offlineView():!S.loaded.t?loadingView():!S.rows.length?emptyView():VIEWS[S.page]();
+  icons();
+  if(qPos!=null){const q=$('#q');if(q){q.focus();q.setSelectionRange(qPos,qPos)}}
+  v.querySelectorAll('.lift,.stat').forEach(el=>el.classList.add('tilt','shine'));
+  if(S.animate)setupReveal(v);else requestAnimationFrame(()=>v.querySelectorAll('.ring-fg[data-off]').forEach(el=>el.style.strokeDashoffset=el.dataset.off));
+  mount3D();
+  S.animate=false;
+  alerts();
+}
+function rerender(){S.animate=false;render()}
+let IO=null;
+function reveal(el){el.classList.add('in');el.querySelectorAll('.ring-fg[data-off]').forEach(r=>r.style.strokeDashoffset=r.dataset.off);countUps(el)}
+function setupReveal(v){
+  const els=[...v.querySelectorAll('.head,.card,.stat,.rw,.hbar,.mix-row,tbody tr,.tcard,.facc,.runway,.split')];
+  if(IO)IO.disconnect();
+  if(reduce||!('IntersectionObserver' in window)){els.forEach(e=>e.classList.add('sr'));reveal(v);v.querySelectorAll('.sr').forEach(e=>e.classList.add('in'));return}
+  const sib=new Map();
+  els.forEach(e=>{const p=e.parentNode,n=sib.get(p)||0;sib.set(p,n+1);e.style.setProperty('--d',Math.min(n,12)*(e.tagName==='TR'?40:70)+'ms');e.classList.add('sr')});
+  IO=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){reveal(x.target);IO.unobserve(x.target)}}),{threshold:0.06,rootMargin:'0px 0px -5% 0px'});
+  els.forEach(e=>IO.observe(e));
+}
+function onScroll(){
+  const y=window.scrollY||0,h=document.documentElement.scrollHeight-innerHeight;
+  const pr=document.getElementById('prog');if(pr)pr.style.transform='scaleX('+(h>0?Math.min(1,y/h):0)+')';
+  const tp=document.querySelector('.top');if(tp)tp.classList.toggle('scrolled',y>12);
+  const hc=document.querySelector('.hero-copy');if(hc&&!reduce){hc.style.transform='translateY('+(y*0.18)+'px)';hc.style.opacity=String(Math.max(0,1-y/420))}
+  if(G)G.scroll=y;
+}
+let scrT=0;addEventListener('scroll',()=>{if(!scrT)scrT=requestAnimationFrame(()=>{scrT=0;onScroll()})},{passive:true});
+function countUps(root){
+  if(reduce)return;
+  [root,...root.querySelectorAll('[data-count]')].filter(el=>el.dataset&&el.dataset.count!=null&&!el.dataset.done).forEach(el=>{el.dataset.done='1';
+    const to=+el.dataset.count,f=el.dataset.fmt,t0=performance.now(),dur=1400;
+    const fmt=v=>f==='pct'?Math.round(v)+'%':f==='int'?String(Math.round(v)):short(v);
+    (function step(t){const p=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-p,4);el.textContent=fmt(to*e);if(p<1)requestAnimationFrame(step)})(t0);
+  });
+}
+
+/* ---------- 3D portfolio ---------- */
+let G=null;
+function css(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+function sig3d(){return curTheme()+'|'+S.rows.map(r=>r.id+r.property+r.status+bucket(r)).join(',')+'|'+facilities().join(',')}
+function init3D(){
+  const T=window.THREE;
+  const r=new T.WebGLRenderer({antialias:true,alpha:true});
+  r.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+  r.outputEncoding=T.sRGBEncoding;r.shadowMap.enabled=true;r.shadowMap.type=T.PCFSoftShadowMap;
+  const scene=new T.Scene();
+  const cam=new T.PerspectiveCamera(32,1,0.1,300);
+  scene.add(new T.HemisphereLight(0xffffff,0x6b7a99,0.75));
+  const sun=new T.DirectionalLight(0xffffff,0.9);sun.position.set(-14,26,16);sun.castShadow=true;
+  sun.shadow.mapSize.set(1024,1024);Object.assign(sun.shadow.camera,{left:-22,right:22,top:22,bottom:-22,near:1,far:80});scene.add(sun);
+  const rim=new T.DirectionalLight(0x9fc2ff,0.35);rim.position.set(18,10,-18);scene.add(rim);
+  const world=new T.Group();scene.add(world);
+  G={T,r,scene,cam,world,towers:[],sig:null,rotY:-0.55,velY:0,drag:null,hover:null,raf:0,t0:0,ray:new T.Raycaster(),mouse:new T.Vector2(-9,-9)};
+  const el=r.domElement;
+  el.addEventListener('pointerdown',e=>{G.drag={x:e.clientX,y:e.clientY,moved:0,ry:G.rotY};el.setPointerCapture(e.pointerId);el.parentNode&&el.parentNode.classList.add('drag')});
+  el.addEventListener('pointermove',e=>{
+    const b=el.getBoundingClientRect();G.mouse.set((e.clientX-b.left)/b.width*2-1,-((e.clientY-b.top)/b.height)*2+1);G.mx=e.clientX-b.left;G.my=e.clientY-b.top;
+    if(G.drag){const dx=e.clientX-G.drag.x;G.drag.moved=Math.max(G.drag.moved,Math.abs(dx)+Math.abs(e.clientY-G.drag.y));G.velY=(G.drag.ry+dx*0.008)-G.rotY;G.rotY=G.drag.ry+dx*0.008}
+  });
+  el.addEventListener('pointerup',e=>{const d=G.drag;G.drag=null;el.parentNode&&el.parentNode.classList.remove('drag');if(d&&d.moved<6&&G.hover){S.fac=G.hover.userData.fac;S.st='all';S.ty='all';S.bucket='all';S.q='';go('tenants')}});
+  el.addEventListener('pointerleave',()=>{G.mouse.set(-9,-9);G.hover=null;const tp=$('#tip3d');tp&&tp.classList.remove('show')});
+}
+function mat(T,col,opts){return new T.MeshStandardMaterial(Object.assign({color:new T.Color(col),roughness:.45,metalness:.08},opts||{}))}
+function build3D(){
+  const T=G.T;
+  while(G.world.children.length){const c=G.world.children.pop();c.traverse(o=>{o.geometry&&o.geometry.dispose();o.material&&o.material.dispose&&o.material.dispose()})}
+  G.towers=[];
+  const dark=curTheme()==='dark';
+  const ground=new T.Mesh(new T.CylinderGeometry(19,19.6,0.6,96),mat(T,dark?'#161A21':'#F6F7FA',{roughness:.95}));
+  ground.position.y=-0.3;ground.receiveShadow=true;G.world.add(ground);
+  const ringM=new T.Mesh(new T.TorusGeometry(19.1,0.06,8,160),new T.MeshBasicMaterial({color:new T.Color(css('--accent'))}));ringM.rotation.x=Math.PI/2;ringM.position.y=0.02;G.world.add(ringM);
+  const facs=facilities().map(p=>({p,u:S.rows.filter(r=>r.property===p)})).filter(f=>f.u.length).sort((a,b)=>b.u.length-a.u.length);
+  const n=facs.length,cols=Math.ceil(Math.sqrt(n)),gap=7.2;
+  const glass=dark?'#3A4354':'#D6DCE6',amber=css('--amber')||'#E0A21B',nm=dark?'#2A2F38':'#AEB5C2';
+  // order: tallest in the middle using a spiral of grid slots sorted by distance from centre
+  const slots=[];for(let i=0;i<cols;i++)for(let j=0;j<Math.ceil(n/cols);j++)slots.push({x:(i-(cols-1)/2)*gap,z:(j-(Math.ceil(n/cols)-1)/2)*gap});
+  slots.sort((a,b)=>(a.x*a.x+a.z*a.z)-(b.x*b.x+b.z*b.z));
+  facs.forEach((f,i)=>{
+    const g=new T.Group();g.position.set(slots[i].x,0,slots[i].z);g.userData={fac:f.p,n:f.u.length,occ:f.u.filter(r=>r.status==='occupied').length};
+    const col=facColor(f.p),units=f.u.slice().sort((a,b)=>({occupied:0,vacated:1,vacant:1,not_managed:2}[a.status]-{occupied:0,vacated:1,vacant:1,not_managed:2}[b.status]));
+    const base=new T.Mesh(new T.BoxGeometry(4.2,0.25,4.2),mat(T,dark?'#232833':'#E3E7EE',{roughness:.9}));base.position.y=0.125;base.receiveShadow=true;g.add(base);
+    const fh=0.62;
+    units.forEach((u,k)=>{
+      const occ=u.status==='occupied',b=bucket(u),soon=['expired','d30','d60','d90'].includes(b);
+      let m;
+      if(occ)m=mat(T,soon?amber:col,{emissive:new T.Color(soon?amber:col),emissiveIntensity:dark?.32:.12});
+      else if(u.status==='not_managed')m=mat(T,nm,{roughness:.8});
+      else m=mat(T,glass,{transparent:true,opacity:dark?.55:.6,roughness:.1,metalness:.3});
+      const fl=new T.Mesh(new T.BoxGeometry(3.2,fh*0.82,3.2),m);
+      fl.position.y=0.25+fh*0.41+k*fh;fl.castShadow=true;fl.receiveShadow=true;
+      fl.userData.delay=i*90+k*55;fl.userData.y=fl.position.y;
+      g.add(fl);
+      // window band
+      const band=new T.Mesh(new T.BoxGeometry(3.26,fh*0.16,3.26),mat(T,dark?'#0E1116':'#FFFFFF',{roughness:.3}));band.position.y=0.25+fh*0.9+k*fh;band.userData.delay=fl.userData.delay;band.userData.y=band.position.y;g.add(band);
+    });
+    const roof=new T.Mesh(new T.BoxGeometry(3.5,0.18,3.5),mat(T,col,{roughness:.6}));roof.position.y=0.25+units.length*fh+0.09;roof.castShadow=true;roof.userData.delay=i*90+units.length*55;roof.userData.y=roof.position.y;g.add(roof);
+    g.userData.h=roof.position.y;
+    G.world.add(g);G.towers.push(g);
+  });
+  G.t0=performance.now();G.sig=sig3d();
+}
+function resize3D(){const host=G.r.domElement.parentNode;if(!host)return;const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;G.r.setSize(w,h,false);G.cam.aspect=w/h;
+  const narrow=w<640;G.cam.position.set(narrow?0:-4,narrow?34:26,narrow?50:40);G.cam.lookAt(narrow?0:-7,narrow?-2:1,0);G.cam.updateProjectionMatrix()}
+function mount3D(){
+  const host=$('#scene3d');if(!host)return;
+  if(!window.THREE){host.innerHTML='';return}
+  try{if(!G)init3D()}catch(e){return}
+  host.appendChild(G.r.domElement);resize3D();
+  if(G.sig!==sig3d())build3D();
+  if(!G.raf)G.raf=requestAnimationFrame(loop3D);
+}
+function loop3D(t){
+  const el=G.r.domElement;
+  if(!document.body.contains(el)){G.raf=0;return}
+  G.raf=requestAnimationFrame(loop3D);
+  if(document.hidden)return;
+  const T=G.T,el2=t-G.t0;
+  if(!G.drag){if(!reduce)G.rotY+=0.0016;G.rotY+=G.velY;G.velY*=0.92}
+  const sy=Math.min(G.scroll||0,700);G.world.rotation.y=G.rotY+sy*0.0016;G.world.position.y=-sy*0.006;G.world.rotation.x=sy*0.00035;
+  G.towers.forEach(g=>g.children.forEach(c=>{if(c.userData.delay==null)return;
+    const p=reduce?1:Math.min(1,Math.max(0,(el2-c.userData.delay)/520)),e=p===1?1:1-Math.pow(1-p,3)*Math.cos(p*4)*1;
+    c.scale.y=Math.max(0.001,Math.min(1.08,e));c.position.y=c.userData.y-(1-p)*1.2}));
+  // hover
+  G.ray.setFromCamera(G.mouse,G.cam);
+  const hits=G.ray.intersectObjects(G.towers,true);
+  let hit=null;if(hits.length){let o=hits[0].object;while(o&&!G.towers.includes(o))o=o.parent;hit=o}
+  if(hit!==G.hover){G.hover=hit;}
+  G.towers.forEach(g=>{const target=g===G.hover?1.07:1;g.scale.x+=(target-g.scale.x)*0.15;g.scale.z=g.scale.x;g.position.y+=((g===G.hover?0.35:0)-g.position.y)*0.15});
+  const tp=$('#tip3d');
+  if(tp){if(G.hover&&!G.drag){const d=G.hover.userData,o=S.rows.filter(r=>r.property===d.fac&&r.status==='occupied');
+      tp.innerHTML=`<b>${esc(facName(d.fac))}</b><small>${d.occ}/${d.n} units occupied · ${short(o.reduce((a,r)=>a+annual(r),0))}/yr</small>`;
+      tp.style.left=G.mx+'px';tp.style.top=G.my+'px';tp.classList.add('show');el.style.cursor='pointer'}
+    else{tp.classList.remove('show');el.style.cursor=''}}
+  G.r.render(G.scene,G.cam);
+}
+addEventListener('resize',()=>{G&&resize3D()});
+
+/* ---------- 3D tilt on cards ---------- */
+document.addEventListener('pointermove',e=>{
+  if(reduce||e.pointerType!=='mouse')return;
+  const c=e.target.closest('.tilt');
+  if(!c)return;
+  const b=c.getBoundingClientRect(),x=(e.clientX-b.left)/b.width,y=(e.clientY-b.top)/b.height;
+  c.style.transform=`perspective(900px) rotateX(${(0.5-y)*7}deg) rotateY(${(x-0.5)*9}deg) translateY(-4px)`;
+  c.style.setProperty('--mx',x*100+'%');c.style.setProperty('--my',y*100+'%');
+});
+document.addEventListener('pointerout',e=>{const c=e.target.closest&&e.target.closest('.tilt');if(c&&!c.contains(e.relatedTarget))c.style.transform=''});
+
+/* ---------- alerts popover ---------- */
+function alertList(){return S.rows.filter(r=>['expired','d30'].includes(bucket(r))).sort((a,b)=>daysLeft(a)-daysLeft(b))}
+function alerts(){$('#bellDot').hidden=!alertList().length}
+function togglePop(){const h=$('#popHost');if(h.innerHTML){h.innerHTML='';return}
+  const L=alertList();
+  h.innerHTML=`<div class="pop" role="dialog" aria-label="Lease alerts"><h5>Lease alerts</h5>${L.length?L.map(t=>{const d=daysLeft(t);return `<button class="note" data-open="${esc(t.id)}"><span class="ic" style="background:var(--bad-soft);color:var(--bad)"><i data-lucide="${d<0?'alert-triangle':'clock'}" style="width:14px;height:14px"></i></span><span>${esc(tenantName(t))}<small>${esc(facName(t.property))} · ${esc(unitName(t))} · ${d<0?'ended '+(-d)+' days ago':'ends in '+d+' days'}</small></span></button>`}).join(''):'<div class="empty">No leases expired or ending within 30 days.</div>'}</div>`;icons()}
+
+/* ---------- drawer (view / edit) ---------- */
+const FIELDS=[
+  ['sect','Tenant'],['tenant','Tenant name','text','full'],['org','Organisation or employer','text','full'],['type','Tenant type','select:Individual|Company|Embassy'],['group','Group (links related units)','text'],
+  ['phone','Phone','text'],['email','Email','email'],
+  ['sect','Unit'],['property','Facility','facility'],['unit','Unit / apartment','text'],['status','Status','select:occupied=Occupied|vacant=Vacant|vacated=Vacated|not_managed=Not managed'],['vacatedOn','Vacated on','date'],
+  ['sect','Lease'],['billing','Billing','select:upfront=Paid upfront|monthly=Monthly'],['renewal','Renewal','select:=Not started|In talks|Renewed|Leaving'],['start','Lease start','date'],['end','Lease end','date'],
+  ['rent','Rent for the whole term (₦)','number'],['sc','Service charge for the whole term (₦)','number'],['monthly','Monthly rent (₦, monthly billing only)','number'],['currency','Lease currency','select:NGN|USD|EUR|GBP'],
+  ['fxRent','Rent per year in lease currency','number'],['fxSc','Service charge per year in lease currency','number'],
+  ['sect','Notes'],['note','Notes','textarea','full']
+];
+function openDrawer(id){
+  const isNew=!id,t=isNew?{status:'occupied',type:'Individual',billing:'upfront',currency:'NGN',renewal:'',property:S.fac!=='all'?S.fac:facilities()[0]}:S.rows.find(r=>r.id===id);
+  if(!t){toast('That record no longer exists');return}
+  $('#popHost').innerHTML='';
+  const ro=!S.canWrite;
+  const input=f=>{const [k,l,type,w]=f,v=t[k]==null?'':t[k],dis=ro?'disabled':'';
+    let el;
+    if(type==='facility')el=`<select id="f_${k}" ${dis}>${facilities().map(p=>`<option value="${esc(p)}" ${p===v?'selected':''}>${esc(facName(p))}</option>`).join('')}</select>`;
+    else if(type.startsWith('select:'))el=`<select id="f_${k}" ${dis}>${type.slice(7).split('|').map(o=>{const [val,lab]=o.includes('=')?o.split('='):[o,o];return `<option value="${esc(val)}" ${String(v)===val?'selected':''}>${esc(lab)}</option>`}).join('')}</select>`;
+    else if(type==='textarea')el=`<textarea id="f_${k}" rows="3" ${dis}>${esc(v)}</textarea>`;
+    else el=`<input id="f_${k}" type="${type==='number'?'text':type}" ${type==='number'?'inputmode="decimal"':''} value="${esc(type==='number'&&v!==''?Number(v).toLocaleString('en-NG'):v)}" ${dis}>`;
+    return `<label class="field ${w==='full'?'full':''}">${l}${el}${k==='rent'&&!isNew&&t.status==='occupied'&&years(t)>1?`<small>${years(t)}-year term · ${naira(annual(t))} per year</small>`:''}</label>`};
+  $('#modalHost').innerHTML=`<div class="scrim" id="scrim"><form class="drawer" id="dform" novalidate>
+    <div class="dhead">${avatar(t,48)}<div style="min-width:0;flex:1"><h3>${isNew?'Add tenant':esc(tenantName(t))}</h3><div class="muted">${isNew?'New record':esc(facName(t.property))+' · '+esc(unitName(t))}</div></div><button type="button" class="ibtn" id="dClose" aria-label="Close"><i data-lucide="x"></i></button></div>
+    ${!isNew?`<div class="tools">${statusChip(t)}${t.phone?`<button type="button" class="chip blue" data-copy="${esc(t.phone)}"><i data-lucide="phone" style="width:12px;height:12px"></i>Copy phone</button>`:''}${t.email?`<button type="button" class="chip blue" data-copy="${esc(t.email)}"><i data-lucide="mail" style="width:12px;height:12px"></i>Copy email</button>`:''}</div>`:''}
+    <div class="fields">${FIELDS.map(f=>f[0]==='sect'?`<div class="sect">${f[1]}</div>`:input(f)).join('')}</div>
+    <div class="err" id="dErr"></div>
+    <div class="dfoot">${ro?'<span class="muted">You have view-only access to this registry.</span><span></span>':`<span>${isNew?'':`<button type="button" class="btn btn-danger btn-sm" id="dDel"><i data-lucide="trash-2"></i>Delete record</button>`}</span><span class="tools"><button type="button" class="btn btn-ghost" id="dCancel">Cancel</button><button class="btn btn-dark" type="submit" id="dSave">${isNew?'Add tenant':'Save changes'}</button></span>`}</div>
+  </form></div>`;
+  icons();
+  const close=()=>{$('#modalHost').innerHTML='';if(pendingRender){pendingRender=false;rerender()}};
+  $('#dClose').onclick=close;if($('#dCancel'))$('#dCancel').onclick=close;
+  $('#scrim').onclick=e=>{if(e.target.id==='scrim')close()};
+  const del=$('#dDel');
+  if(del)del.onclick=async()=>{
+    if(del.dataset.armed!=='1'){del.dataset.armed='1';del.innerHTML='Tap again to delete for everyone';return}
+    del.disabled=true;
+    if(await writeDoc(t.id,null)){close();toast(`Deleted ${tenantName(t)}`)}else{del.disabled=false;$('#dErr').textContent=lastErr}
+  };
+  if(!ro)$('#dform').onsubmit=async e=>{
+    e.preventDefault();
+    const o=Object.assign({},t);delete o.__v;
+    for(const f of FIELDS){if(f[0]==='sect')continue;const el=$('#f_'+f[0]);let v=el.value.trim();
+      if(f[2]==='number'){v=v.replace(/[^\d.]/g,'');v=v===''?null:Number(v)}else if(f[2]==='date'){v=v||null}else if(['tenant','org','phone','email'].includes(f[0])){v=v||null}
+      o[f[0]]=v}
+    if(o.status==='occupied'&&!o.tenant){$('#dErr').textContent='Enter the tenant name for an occupied unit.';return}
+    if(o.start&&o.end&&o.end<o.start){$('#dErr').textContent='The lease end date is before the start date.';return}
+    if(o.status==='occupied'&&o.billing==='upfront'&&!o.end){$('#dErr').textContent='Add a lease end date, or set billing to Monthly.';return}
+    if(o.email&&!/^\S+@\S+\.\S+$/.test(o.email)){$('#dErr').textContent='That email address looks incomplete.';return}
+    if(o.status==='occupied'){o.vacatedOn=null}
+    if(o.status==='vacant'){o.tenant=null;o.org=null;o.phone=null;o.email=null;o.start=null;o.end=null;o.rent=0;o.sc=0;o.renewal=''}
+    o.rent=o.rent||0;o.sc=o.sc||0;
+    if(!o.id)o.id='t'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+    $('#dSave').disabled=true;$('#dSave').textContent='Saving…';
+    if(await writeDoc(o.id,o)){close();toast(isNew?`Added ${tenantName(o)}`:'Changes saved for everyone')}
+    else{$('#dSave').disabled=false;$('#dSave').textContent=isNew?'Add tenant':'Save changes';$('#dErr').textContent=lastErr}
+  };
+}
+
+/* ---------- data ---------- */
+async function writeDoc(id,data){
+  if(!DB){lastErr='Not connected to the shared data.';return false}
+  writing++;lastErr='';setSync();
+  const ref=DB.collection(COL_T).doc(id);
+  let ok=false;
+  for(let i=0;i<2;i++){
+    try{await (data?ref.set(data):ref.delete());ok=true;break}
+    catch(e){const c=e&&e.code;
+      if(c==='unavailable'&&i===0){await new Promise(r=>setTimeout(r,600+Math.random()*800));continue}
+      lastErr=(c==='invalid_argument'||c==='permission-denied')?'You have view-only access, so this was not saved.':c==='quota_exceeded'?'The registry database is full. Delete old records first.':'Could not save. Check your connection and try again.';
+      if(c==='invalid_argument'||c==='permission-denied'){S.canWrite=false;document.body.classList.add('ro')}
+      break}
+  }
+  writing--;setSync();return ok;
+}
+async function setRenewal(id,v){const t=S.rows.find(r=>r.id===id);if(!t)return;const o=Object.assign({},t);o.renewal=v;if(await writeDoc(id,o))toast(v?`${tenantName(t)}: ${v}`:'Renewal reset')}
+async function vacate(id){const t=S.rows.find(r=>r.id===id);if(!t)return;const o=Object.assign({},t);o.status='vacated';o.vacatedOn=new Date().toISOString().slice(0,10);if(await writeDoc(id,o))toast(`${unitName(t)} at ${facName(t.property)} marked vacated`)}
+function csv(){
+  const cols=['property','unit','tenant','org','type','group','phone','email','status','billing','start','end','rent','sc','annual_rent','currency','fxRent','fxSc','renewal','vacatedOn','note'];
+  const q=v=>{v=v==null?'':String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+  return [cols.join(',')].concat(filteredOrAll().map(t=>cols.map(c=>q(c==='annual_rent'?Math.round(annual(t)):t[c])).join(','))).join('\n');
+}
+function filteredOrAll(){return S.page==='tenants'?filtered():S.rows}
+async function exportCsv(){
+  if(!S.rows.length){toast('Nothing to export yet');return}
+  const name=`vestates-tenants-${new Date().toISOString().slice(0,10)}.csv`;
+  if(!DL){const b=new Blob([csv()],{type:'text/csv'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000);toast('Export downloaded');return}
+  try{await DL.save({filename:name,data:csv()});toast('Export ready')}catch(e){if(e&&e.code!=='declined')toast('Could not create the file. Try again.')}
+}
+function connect(){
+  const c=window.claude;
+  if(!c||typeof c.use!=='function'){connectFirebase();return}
+  c.use('db').then(db=>{
+    if(!db){S.offline=true;setSync();render();return}
+    DB=db;
+    db.doc('config/main').onSnapshot(s=>{const d=s.exists?s.data():{};S.props=(d.properties||[]).slice();S.colors=Object.assign({},d.propColors||{});S.loaded.c=true;rerender()},()=>{});
+    db.collection('tenants').onSnapshot(s=>{S.rows=s.docs.map(d=>Object.assign({},d.data(),{id:d.id}));const first=!S.loaded.t;S.loaded.t=true;setSync();if(first){S.animate=true;render()}else rerender()},
+      e=>{lastErr='Live updates stopped. Reload the page.';setSync()});
+  },()=>{S.offline=true;setSync();render()});
+  c.use('user').then(u=>{if(!u)return;
+    u.can('data.write').then(w=>{if(w===false){S.canWrite=false;document.body.classList.add('ro');setSync();rerender()}});
+    u.me&&u.me().then(m=>{if(m&&m.name){$('#meName').textContent=m.name;$('#meAv').textContent=ini(m.name)}}).catch(()=>{});
+  });
+  c.use('downloads').then(d=>{DL=d});
+  setTimeout(()=>{if(!DB&&!S.offline){S.offline=true;setSync();render()}},11000);
+}
+
+
+/* ---------- Firebase mode (GitHub Pages) ---------- */
+function connectFirebase(){
+  if(!window.firebase||!FIREBASE_CONFIG.apiKey){S.offline=true;S.offlineMsg='Add your Firebase settings at the top of index.html, then reload.';setSync();render();return}
+  FB=true;COL_T='units';DOC_C='config/main';
+  try{firebase.initializeApp(FIREBASE_CONFIG)}catch(e){}
+  const auth=firebase.auth();
+  auth.onAuthStateChanged(u=>{
+    UNSUB.forEach(f=>{try{f()}catch(_){}});UNSUB=[];
+    if(!u){S.verify=false;S.needAuth=true;S.loaded.t=false;S.rows=[];DB=null;$('#btnSignOut').hidden=true;setSync();S.animate=true;render();return}
+    S.needAuth=false;S.offline=false;$('#btnSignOut').hidden=false;
+    const nm=u.displayName||u.email||'Signed in';$('#meName').textContent=nm;$('#meAv').textContent=ini(nm);
+    DB=firebase.firestore();
+    S.canWrite=true;document.body.classList.remove('ro');
+    S.verify=false;if(!u.emailVerified){S.verify=u.email;u.sendEmailVerification().catch(()=>{});setSync();S.animate=true;render();return}
+    DB.collection('members').doc(String(u.email).toLowerCase()).get().then(d=>{
+      if(!d.exists){S.offline=true;S.offlineMsg=u.email+' is not on the team list. Ask an admin to add you in the lease dashboard.';setSync();render();return}
+      const m=d.data()||{};if(m.name){$('#meName').textContent=m.name;$('#meAv').textContent=ini(m.name)}
+      if(!['editor','admin'].includes(m.role)){S.canWrite=false;document.body.classList.add('ro');setSync();rerender()}
+    }).catch(()=>{});
+    UNSUB.push(DB.doc(DOC_C).onSnapshot(s=>{const d=s.exists?s.data():{};S.props=(d.properties||[]).slice();S.colors=Object.assign({},d.propColors||{});S.loaded.c=true;rerender()},()=>{}));
+    UNSUB.push(DB.collection(COL_T).onSnapshot(s=>{S.rows=s.docs.map(d=>Object.assign({},d.data(),{id:d.id}));const first=!S.loaded.t;S.loaded.t=true;setSync();if(first){S.animate=true;render()}else rerender()},
+      e=>{if(e&&e.code==='permission-denied'){S.offline=true;S.offlineMsg='Your account is not on the team list. Ask an admin to add you in the lease dashboard.'}else lastErr='Live updates stopped. Reload the page.';setSync();render()}));
+  });
+}
+document.addEventListener('submit',async e=>{
+  if(e.target.id!=='signin')return;e.preventDefault();
+  const em=$('#siEmail').value.trim(),pw=$('#siPass').value,err=$('#siErr'),b=$('#siBtn');
+  err.style.color='';
+  if(!em||!pw){err.textContent='Enter your email and password.';return}
+  b.disabled=true;b.textContent='Signing in…';err.textContent='';
+  try{await firebase.auth().signInWithEmailAndPassword(em,pw)}catch(x){err.textContent=authMsg(x&&x.code);b.disabled=false;b.textContent='Sign in'}
+});
+document.addEventListener('click',async e=>{
+  const t=e.target.closest('#siGoogle,#siReset,#vfDone,#vfResend,#vfOut');if(!t)return;
+  const A=firebase.auth();
+  if(t.id==='siGoogle'){try{const p=new firebase.auth.GoogleAuthProvider();p.setCustomParameters({prompt:'select_account'});await A.signInWithPopup(p)}catch(x){const er=$('#siErr');if(er)er.textContent=authMsg(x&&x.code)}}
+  if(t.id==='siReset'){const em=$('#siEmail').value.trim(),er=$('#siErr');if(!em){er.style.color='';er.textContent='Type your email address above first.';return}
+    try{await A.sendPasswordResetEmail(em);er.style.color='var(--good)';er.textContent='If that address has an account, a reset link is on its way.'}catch(x){er.style.color='';er.textContent=authMsg(x&&x.code)}}
+  if(t.id==='vfDone'){const u=A.currentUser,m=$('#vfMsg');if(!u)return;await u.reload();await u.getIdToken(true);if(A.currentUser&&A.currentUser.emailVerified)location.reload();else m.textContent='Not confirmed yet. Open the link in the email first (check spam too).'}
+  if(t.id==='vfResend'){const m=$('#vfMsg');try{await A.currentUser.sendEmailVerification();m.style.color='var(--good)';m.textContent='Sent. Check your inbox and spam folder.'}catch(x){m.style.color='';m.textContent=authMsg(x&&x.code)}}
+  if(t.id==='vfOut')A.signOut();
+});
+document.addEventListener('click',e=>{if(e.target.closest('#btnSignOut')&&FB){firebase.auth().signOut();toast('Signed out')}});
+document.addEventListener('change',async e=>{
+  if(e.target.id!=='importFile'||!DB)return;
+  const f=e.target.files[0];if(!f)return;
+  try{
+    const j=JSON.parse(await f.text()),rows=Array.isArray(j)?j:(j.tenants||[]);
+    if(!rows.length){toast('No tenants found in that file');return}
+    toast('Importing '+rows.length+' records…');
+    for(let i=0;i<rows.length;i+=400){const b=DB.batch();rows.slice(i,i+400).forEach(r=>{const id=String(r.id||('t'+Math.random().toString(36).slice(2,10)));b.set(DB.collection(COL_T).doc(id),Object.assign({},r,{id}))});await b.commit()}
+    if(j.config)await DB.doc(DOC_C).set(j.config);
+    toast('Imported '+rows.length+' tenant records');
+  }catch(x){toast(x&&x.code==='permission-denied'?'Your account cannot write to the registry.':'That file could not be imported. Use the tenants.json export.')}
+});
+
+/* ---------- events ---------- */
+document.addEventListener('click',e=>{
+  const cp=e.target.closest('[data-copy]');
+  if(cp){e.stopPropagation();const v=cp.dataset.copy;(navigator.clipboard?navigator.clipboard.writeText(v):Promise.reject()).then(()=>toast('Copied '+v),()=>toast(v));return}
+  const t=e.target.closest('button,[data-open],[data-fac],select');
+  if(!t){if(!e.target.closest('.pop'))$('#popHost').innerHTML='';return}
+  if(t.tagName==='SELECT')return;
+  if(!t.closest('.pop')&&t.id!=='btnBell')$('#popHost').innerHTML='';
+  if(t.dataset.go){go(t.dataset.go);return}
+  if(t.dataset.themeSet){setTheme(t.dataset.themeSet);return}
+  if(t.id==='btnTheme2'){setTheme(curTheme()==='dark'?'light':'dark');return}
+  if(t.id==='btnBell'){togglePop();return}
+  if(t.id==='btnSearch'){S.page!=='tenants'&&go('tenants');setTimeout(()=>{const q=$('#q');q&&q.focus()},300);return}
+  if(t.id==='btnExport'||t.id==='btnExport2'||t.id==='btnExport3'){exportCsv();return}
+  if(t.dataset.new){if(!S.canWrite){toast('You have view-only access');return}openDrawer(null);return}
+  if(t.dataset.vacate){e.stopPropagation();if(t.dataset.armed!=='1'){t.dataset.armed='1';t.textContent='Tap to confirm';return}vacate(t.dataset.vacate);return}
+  if(t.dataset.open){openDrawer(t.dataset.open);return}
+  if(t.dataset.fac!=null){S.fac=t.dataset.fac;S.st='all';S.ty='all';S.bucket='all';S.q='';go('tenants');return}
+  if(t.dataset.bucket){S.bucket=t.dataset.bucket;if(t.dataset.bucket!=='all'){S.st='all';S.fac='all';S.ty='all';S.q='';go('tenants')}else rerender();return}
+  if(t.dataset.filter){const [k,v]=t.dataset.filter.split(':');S.st=v;S.fac='all';S.ty='all';S.bucket='all';S.q='';go('tenants');return}
+  if(t.dataset.st){S.st=t.dataset.st;rerender();return}
+  if(t.dataset.view){S.view=t.dataset.view;try{localStorage.setItem('vtr-view',S.view)}catch(_){}S.animate=true;render();return}
+  if(t.id==='clearF'){S.q='';S.fac='all';S.ty='all';S.st='all';S.bucket='all';rerender();return}
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){if($('#modalHost').innerHTML){$('#modalHost').innerHTML='';if(pendingRender){pendingRender=false;rerender()}}$('#popHost').innerHTML=''}
+  if(e.key==='Enter'&&e.target.matches&&e.target.matches('[data-open],[data-fac]')&&e.target.tagName!=='BUTTON')e.target.click();
+});
+let qT;
+document.addEventListener('input',e=>{if(e.target.id==='q'){S.q=e.target.value;clearTimeout(qT);qT=setTimeout(rerender,120)}});
+document.addEventListener('change',e=>{
+  const t=e.target;
+  if(t.id==='facSel'){S.fac=t.value;rerender()}
+  if(t.id==='tySel'){S.ty=t.value;rerender()}
+  if(t.dataset.renew){setRenewal(t.dataset.renew,t.value)}
+});
+document.addEventListener('focusout',()=>{setTimeout(()=>{if(pendingRender&&!$('#modalHost').innerHTML){const a=document.activeElement;if(!(a&&$('#view').contains(a)&&/INPUT|SELECT|TEXTAREA/.test(a.tagName))){pendingRender=false;rerender()}}},50)});
+
+/* theme */
+function curTheme(){const a=document.documentElement.dataset.theme;return a||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}
+function setTheme(t){document.documentElement.dataset.theme=t;try{localStorage.setItem('vtr-theme',t)}catch(e){}markTheme()}
+function markTheme(){const t=curTheme();document.querySelectorAll('[data-theme-set]').forEach(b=>b.classList.toggle('on',b.dataset.themeSet===t));if(G&&S.loaded.t)mount3D()}
+
+/* boot */
+try{const t=localStorage.getItem('vtr-theme');if(t)document.documentElement.dataset.theme=t;const v=localStorage.getItem('vtr-view');if(v)S.view=v}catch(e){}
+buildNav();icons();markTheme();setSync();
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',markTheme);
+const h=(location.hash||'').slice(1);
+go(VIEWS[h]?h:'overview',{noScroll:true});
+addEventListener('resize',moveInd);
+document.fonts&&document.fonts.ready.then(moveInd);
+connect();
+})();
+</script>
+
+</body>
+</html>
